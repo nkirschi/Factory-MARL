@@ -29,8 +29,8 @@ class BaseEnv(gym.Env):
         force_contact_threshold: float = 100.0,  # threshold for contact forces with arms, above which the episode is terminated
         max_num_objects: int = 10,
         control_frequency: float = 10,  # Hz
-        spawn_freq: int = 1 / 5,
-        spawn_freq_increase: int = 1.0005,
+        spawn_freq: float = 1 / 5,
+        spawn_freq_increase: float = 1.0005,
     ):
 
         self.metadata = {

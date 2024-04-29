@@ -35,7 +35,6 @@ class TaskManager:
         self._init_qpos[:, 1] += np.arange(self.n_obj) * 0.2
         self._init_qpos = self._init_qpos.flatten()
         self._spawn_pos = np.array([0.0, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0])
-        # self._spawn_pos = np.array([0.8, 0.8, 2.0, 1.0, 0.0, 0.0, 0.0])
 
     @property
     def terminate(self) -> bool:
