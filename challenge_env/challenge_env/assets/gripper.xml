@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mujoco model="single_gripper">
+    <worldbody>
+        <body name="gripper_base" pos="0 0 0" quat="1 0 0 0">
+            <inertial pos="0.035 0.0125 0.015" mass="0.73" diaginertia="0.001 0.0025 0.0017" />
+            <geom type="box" condim="3" size="0.07 0.025 0.015" pos="0.0 0.0 0.015"
+                friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                priority="1" />
+            <body name="left_plate" pos="0.005 0.0 0.05" quat="1 0 0 0">
+                <inertial pos="0.0 0.0 0.0" mass="0.015" diaginertia="2.375e-6 2.375e-6 7.5e-7" />
+                <geom type="box" condim="3" pos="0.0 -0.0075 -0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <geom type="box" condim="3" pos="0.0 -0.0075 0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <geom type="box" condim="3" pos="0.0 0.0075 -0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <geom type="box" condim="3" pos="0.0 0.0075 0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <joint name="left_plate_slide_joint" type="slide" axis="1 0 0" limited="true"
+                    range="0.0 0.060000000000000005" />
+            </body>
+            <body name="right_plate" pos="-0.005 0.0 0.05" quat="0 0 0 1">
+                <inertial pos="0.0 0.0 0.0" mass="0.015" diaginertia="2.375e-6 2.375e-6 7.5e-7" />
+                <geom type="box" condim="3" pos="0.0 -0.0075 -0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <geom type="box" condim="3" pos="0.0 -0.0075 0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <geom type="box" condim="3" pos="0.0 0.0075 -0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <geom type="box" condim="3" pos="0.0 0.0075 0.01" size="0.005 0.0075 0.01"
+                    friction="2.0 0.01 0.01" solimp="0.99 0.9999 0.001 0.5 2.0" solref="0.002 1.0"
+                    priority="1" />
+                <joint name="right_plate_slide_joint" type="slide" axis="1 0 0" limited="true"
+                    range="0.0 0.060000000000000005" />
+            </body>
+            <site name="between_gripper_plates" pos="0.0 0.0 0.05" />
+        </body>
+    </worldbody>
+    <equality>
+        <joint joint1="left_plate_slide_joint" joint2="right_plate_slide_joint"
+            solimp="0.98 0.9999 0.001" solref="0.002 1.0" />
+    </equality>
+    <contact>
+        <exclude body1="gripper_base" body2="left_plate" />
+        <exclude body1="gripper_base" body2="right_plate" />
+        <exclude body1="left_plate" body2="right_plate" />
+    </contact>
+    <tendon>
+        <fixed name="split">
+            <joint joint="left_plate_slide_joint" coef="0.5" />
+            <joint joint="right_plate_slide_joint" coef="0.5" />
+        </fixed>
+    </tendon>
+    <actuator>
+        <general name="gripper_linear_actuator" tendon="split" dyntype="none" biastype="affine"
+            forcerange="-100 100" ctrlrange="0.0 0.060000000000000005" gainprm="100 0 0"
+            biasprm="0 -100 -10" />
+    </actuator>
+</mujoco>
