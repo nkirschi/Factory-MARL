@@ -13,13 +13,14 @@ class TaskEnv(BaseEnv):
         self,
         render_mode: Optional[str] = None,
         seed: Optional[int] = None,
+        window_size=1024
     ):
         """
         This class defines a custom task environment, including custom observation and action spaces,
         and a custom reward function. It inherits from BaseEnv, which is a subclass of gym.Env.
         """
 
-        super().__init__(render_mode=render_mode, seed=seed)
+        super().__init__(render_mode=render_mode, seed=seed, width=window_size, height=window_size)
 
         self.ik_policy_id = 0  # Here, IK policy controls arm 0
 
