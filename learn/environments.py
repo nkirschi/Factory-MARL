@@ -22,10 +22,8 @@ class TaskEnv(BaseEnv):
 
         super().__init__(render_mode=render_mode, seed=seed, width=window_size, height=window_size)
 
-        self.ik_policy_id = 0  # Here, IK policy controls arm 0
-
-        if self.ik_policy_id is not None:
-            self.ik_policy = IKPolicy(self, arm_id=self.ik_policy_id)
+        self.ik_policy0 = IKPolicy(self, arm_id=0)
+        self.ik_policy1 = IKPolicy(self, arm_id=1)
 
         # Example custom observation and action spaces:
         obs_dims = 2 * self.dof + 13 * self.max_num_objects
@@ -78,6 +76,14 @@ class TaskEnv(BaseEnv):
         ctrl = low + (action + 1.0) * 0.5 * (high - low)
         return ctrl
 
+    def _compose_control(self, rl_action):
+        # Override this in a subclass
+        action_arm0 = self.ik_policy0.act()
+        self.ik_policy1.ignore(self.ik_policy0.target_object)
+        action_arm1 = self.ik_policy1.act()
+        self.ik_policy0.ignore(self.ik_policy1.target_object)
+        return action_arm0, action_arm1
+
     def _get_reward(self, state, info) -> float:
         # Your custom reward function goes here
         reward = sum(info["scores"]) - sum(self.last_score)
@@ -86,12 +92,7 @@ class TaskEnv(BaseEnv):
     def step(
         self, action: np.ndarray
     ) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
-
-        # here, the 'action' is the output of your agent policy
-        action_arm1 = self._process_action(action)
-
-        # call the IK policy to control arm 0
-        action_arm0 = self.ik_policy.act()
+        action_arm0, action_arm1 = self._compose_control(action)
 
         state, terminate, info = self.step_sim(
             action_arm0=action_arm0, action_arm1=action_arm1
@@ -109,8 +110,24 @@ class TaskEnv(BaseEnv):
         options: Optional[Dict[str, Any]] = None,
     ) -> Tuple[np.ndarray, Dict[str, Any]]:
         state, info = self.reset_sim(seed=seed)
-        self.ik_policy.reset()
+        self.ik_policy0.reset()
+        self.ik_policy1.reset()
         obs = self._process_observation(state)
         self.last_score = info["scores"]
 
         return obs, {}
+
+
+class SingleDeltaEnv(TaskEnv):
+    def __init__(
+        self,
+        render_mode: Optional[str] = None,
+        seed: Optional[int] = None,
+        window_size=1024
+    ):
+        super().__init__(render_mode=render_mode, seed=seed, window_size=window_size)
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self.ik_policy0.act()
+        action_arm1 = self.ik_policy1.act() + self._process_action(rl_action)
+        return action_arm0, action_arm1

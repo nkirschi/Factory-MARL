@@ -1,6 +1,6 @@
 import time
 from stable_baselines3 import PPO
-from single_delta_env import SingleDeltaEnv
+from environments import TaskEnv, SingleDeltaEnv
 
 env = SingleDeltaEnv(render_mode="human")
 obs, info = env.reset()

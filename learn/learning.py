@@ -1,6 +1,6 @@
 from stable_baselines3 import PPO
 from stable_baselines3.common.env_util import make_vec_env
-from single_delta_env import SingleDeltaEnv
+from environments import TaskEnv, SingleDeltaEnv
 
 num_envs = 8
 env = make_vec_env(lambda: SingleDeltaEnv(render_mode="rgb_array"), n_envs=num_envs)
