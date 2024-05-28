@@ -131,7 +131,7 @@ if __name__ == "__main__":
         t = 0
         while True:
             t += 1
-            action = env.action_space.sample() * 0.0
+            action = env.action_space.sample()
             observation, reward, terminate, truncate, info = env.step(action)
             if terminate:
                 print(
