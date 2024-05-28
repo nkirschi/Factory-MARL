@@ -84,7 +84,7 @@ class TaskEnv(BaseEnv):
         self.ik_policy0.ignore(self.ik_policy1.target_object)
         return action_arm0, action_arm1
 
-    def _get_reward(self, state, info) -> float:
+    def _get_reward(self, state, action, info) -> float:
         # Your custom reward function goes here
         reward = sum(info["scores"]) - sum(self.last_score)
         return reward
@@ -98,7 +98,7 @@ class TaskEnv(BaseEnv):
             action_arm0=action_arm0, action_arm1=action_arm1
         )
 
-        reward = self._get_reward(state, info)
+        reward = self._get_reward(state, action, info)
         obs = self._process_observation(state)
         self.last_score = info["scores"].copy()
         return obs, reward, terminate, False, info
@@ -131,3 +131,22 @@ class SingleDeltaEnv(TaskEnv):
         action_arm0 = self.ik_policy0.act()
         action_arm1 = self.ik_policy1.act() + self._process_action(rl_action)
         return action_arm0, action_arm1
+
+
+class SingleDeltaEnvWithNormPenalty(TaskEnv):
+    def __init__(
+        self,
+        render_mode: Optional[str] = None,
+        seed: Optional[int] = None,
+        window_size=1024
+    ):
+        super().__init__(render_mode=render_mode, seed=seed, window_size=window_size)
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self.ik_policy0.act()
+        action_arm1 = self.ik_policy1.act() + self._process_action(rl_action)
+        return action_arm0, action_arm1
+
+    def _get_reward(self, state, action, info) -> float:
+        # Your custom reward function goes here
+        return super()._get_reward(state, action, info) - np.linalg.norm(action)
