@@ -114,30 +114,3 @@ class TaskEnv(BaseEnv):
         self.last_score = info["scores"]
 
         return obs, {}
-
-
-if __name__ == "__main__":
-    import time
-
-    render_mode = "human"  # "human" or "rgb_array"
-
-    env = TaskEnv(render_mode=render_mode)
-    env.reset()
-    num_episodes = 10
-
-    frames = []
-    for e in range(num_episodes):
-        tick = time.time()
-        t = 0
-        while True:
-            t += 1
-            action = env.action_space.sample()
-            observation, reward, terminate, truncate, info = env.step(action)
-            if terminate:
-                print(
-                    f"Episode {e}, Score: {info['scores']}, FPS: {t / (time.time() - tick):.2f}"
-                )
-                env.reset()
-                break
-
-    env.close()
