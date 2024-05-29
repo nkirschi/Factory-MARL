@@ -1,14 +1,14 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240528170107" title="Mean-based learning \&amp; auctions" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes"/>
+<info created="D:20180221134821" modified="D:20240529101958" title="Factory Manipulation with RL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
-\newcommand{\prestitle}{Factory Manipulation with Cooperative
-Multi-agent Reinforcement Learning}
+\newcommand{\prestitle}{Factory Manipulation with RL}
 \newcommand{\presdate}{Munich, 6. Juni 2024}
 
-\usepackage{ngerman}
-\usepackage{amssymb}
+\usepackage{amsmath,amssymb,amsfonts,dsfont,bm}
+
+\usepackage{algorithmic}
 \usepackage{mathtools}
 \usepackage{bbm}
 \newcommand{\eps}{\varepsilon}
@@ -5335,7 +5335,7 @@ h
 <ipestyle name="UP-TUM-presentation">
 <symbol name="Background">
 <group>
-<text matrix="1 0 0 1 -106 -181.542" pos="106 168" stroke="UPgray120" type="minipage" width="721" valign="top" size="footnote">\prestitle~$\boldsymbol|$~\presenter~$\boldsymbol|$~\presdate</text>
+<text matrix="1 0 0 1 -106 -181.542" pos="106 168" stroke="UPgray120" type="minipage" width="721" height="11.2762" depth="4.81" valign="top" size="footnote">\prestitle~$\boldsymbol|$~\presenter~$\boldsymbol|$~\presdate</text>
 </group>
 </symbol>
 <arrowsize name="large" value="20"/>
@@ -5488,34 +5488,110 @@ h
 203.281 323.431 m
 203.281 16.5284 l
 </path>
-<text matrix="1 0 0 1 24 -121.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="616" valign="top" size="LARGE">\prestitle</text>
-<text matrix="1 0 0 1 -184 -72.445" transformations="translations" pos="208 272" stroke="black" type="minipage" width="504" valign="top" size="large">or: How you can steal all my money</text>
-<text matrix="1 0 0 1 -184 -154.445" transformations="translations" pos="208 272" stroke="0.49 0.514 0.51" type="minipage" width="504" valign="top">28. May 2024</text>
-<text matrix="1 0 0 1 24 -350.445" transformations="translations" pos="0 416" stroke="0.49 0.514 0.51" type="minipage" width="504" valign="top" size="small">\presenter</text>
-<text layer="beta" matrix="1 0 0 1 264 -185.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="504" valign="top" size="Large">an Animation!</text>
-<text matrix="1 0 0 1 -8 -5" transformations="translations" pos="272 240" stroke="black" type="label" valign="baseline">with</text>
+<text matrix="1 0 0 1 24 -121.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="616" height="62.1114" depth="55.757" valign="top" size="LARGE">Factory Manipulation \\ with Cooperative
+Multi-agent \\Reinforcement Learning</text>
+<text matrix="1 0 0 1 -184 -154.445" transformations="translations" pos="208 272" stroke="0.49 0.514 0.51" type="minipage" width="504" height="14.4495" depth="7.969" valign="top">28. May 2024</text>
+<text matrix="1 0 0 1 24 -350.445" transformations="translations" pos="0 416" stroke="0.49 0.514 0.51" type="minipage" width="504" height="11.6857" depth="5.213" valign="top" size="small">\presenter</text>
+<text layer="beta" matrix="1 0 0 1 264 -185.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="504" height="15.171" depth="8.697" valign="top" size="Large">an Animation!</text>
+<text matrix="1 0 0 1 -8 -5" transformations="translations" pos="272 240" stroke="black" type="label" width="49.4598" height="17.5695" depth="0" valign="baseline">with</text>
 <image layer="alpha" matrix="0.817072 0 0 0.817072 708.708 -18.131" rect="0 0 638 848" bitmap="2"/>
 <image matrix="0.391671 0 0 0.391671 18.164 432" rect="0 0 740 390" bitmap="1"/>
 </page>
-<page title="Outline">
+<page title="The Reward Function">
 <layer name="alpha"/>
 <layer name="beta"/>
 <layer name="gamma"/>
+<layer name="delta"/>
+<layer name="epsilon"/>
+<layer name="zeta"/>
+<layer name="eta"/>
+<view layers="alpha" active="alpha"/>
+<view layers="alpha beta" active="beta"/>
 <view layers="alpha beta gamma" active="gamma"/>
 <image layer="alpha" matrix="0.0986764 0 0 0.0986764 1037.21 609.881" rect="0 0 1822 590" bitmap="3"/>
-<text matrix="1 0 0 1 0 322" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">Motivation</text>
-<text matrix="1 0 0 1 0 278" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">Preliminaries</text>
-<text matrix="1 0 0 1 0 234" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">Welfare and utility</text>
-<text matrix="1 0 0 1 0 190" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">Myerson revenue</text>
-<text matrix="1 0 0 1 0 146" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">Regret</text>
-<text matrix="1 0 0 1 0 102" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">Mean-based learning algorithm</text>
-<text matrix="1 0 0 1 0 54" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">The strategy</text>
-<text matrix="1 0 0 1 0 6" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">The seller&apos;s benefit</text>
-<text matrix="1 0 0 1 0 -42" pin="h" transformations="translations" pos="0 270.363" stroke="TUMBlue" type="minipage" width="1216" valign="top" style="item">The buyer&apos;s benefit</text>
+<text matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 600" stroke="black" type="minipage" width="1216" height="12.194" depth="5.707" valign="top">Which reward should we use?</text>
+<path layer="beta" matrix="1 0 0 1 0 -48" stroke="TUMBlue" fill="TUMLighterBlue" pen="fat">
+0 544 m
+0 496 l
+1216 496 l
+1216 544 l
+h
+</path>
+<text matrix="1 0 0 1 16 -50" transformations="translations" pos="0 534.099" stroke="TUMBlue" type="minipage" width="1184" height="13.9061" depth="7.449" valign="top">\blue{Reward of 1, if a block is thrown in the basket}, 0 in all other cases</text>
+<text matrix="1 0 0 1 0 -64" pin="h" transformations="translations" pos="0 600" stroke="black" type="minipage" width="1216" height="12.194" depth="5.707" valign="top">1st intention:</text>
+<text layer="gamma" matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 430.744" stroke="TUMBlack" type="minipage" width="1216" height="14.7485" depth="8.268" valign="top">But: \red{Almost no learning possible}</text>
 </page>
-<page>
+<page title="The Reward Function">
 <layer name="alpha"/>
+<layer name="beta"/>
+<layer name="gamma"/>
+<layer name="delta"/>
+<layer name="epsilon"/>
+<layer name="zeta"/>
+<layer name="eta"/>
+<layer name="theta"/>
+<layer name="iota"/>
+<layer name="kappa"/>
+<layer name="lambda"/>
+<layer name="mu"/>
+<layer name="nu"/>
+<layer name="xi"/>
+<layer name="omicron"/>
+<layer name="pi"/>
+<layer name="rho"/>
 <view layers="alpha" active="alpha"/>
+<view layers="alpha beta" active="beta"/>
+<view layers="alpha beta gamma" active="gamma"/>
+<view layers="alpha beta gamma delta kappa" active="delta"/>
+<view layers="alpha beta gamma delta epsilon kappa lambda" active="epsilon"/>
+<view layers="alpha beta gamma delta epsilon zeta kappa lambda mu" active="zeta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta kappa lambda mu nu" active="eta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta kappa lambda mu nu xi" active="theta"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota kappa lambda mu nu xi omicron" active="iota"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota pi" active="pi"/>
+<view layers="alpha beta gamma delta epsilon zeta eta theta iota rho" active="rho"/>
+<text layer="alpha" matrix="1 0 0 1 0 -64" pin="h" transformations="translations" pos="0 600" stroke="black" type="minipage" width="1216" height="12.194" depth="5.707" valign="top">2nd intention:</text>
+<path matrix="1 0 0 1 0 -48" stroke="TUMBlue" fill="TUMLighterBlue" pen="fat">
+0 544 m
+0 496 l
+1216 496 l
+1216 544 l
+h
+</path>
+<text matrix="1 0 0 1 16 -50" transformations="translations" pos="0 534.099" stroke="TUMBlue" type="minipage" width="1184" height="14.7485" depth="8.268" valign="top">Function that \blue{increases monotonously with \emph{progress to target}}</text>
+<text layer="beta" matrix="1 0 0 1 0 176" pin="h" transformations="translations" pos="0 253.083" stroke="TUMBlack" type="minipage" width="576" height="12.194" depth="5.707" valign="top">Parameters to include:</text>
+<text matrix="1 0 0 1 0 208" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="13.884" depth="7.41" valign="top" style="item">$d_c$: Distance to closest cube</text>
+<text matrix="1 0 0 1 0 176" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="13.7696" depth="7.293" valign="top" style="item">$d_r$: Distance to closest robot arm</text>
+<text matrix="1 0 0 1 0 144" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.5496" depth="8.073" valign="top" style="item">$d_b$: Distance to basket</text>
+<text matrix="1 0 0 1 0 112" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.4495" depth="7.969" valign="top" style="item">$g$: Gripper state</text>
+<text matrix="1 0 0 1 0 80" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="13.6279" depth="7.15" valign="top" style="item">$\bm{a} \in [-1,1]^\mathtt{DOF}$: action vector</text>
+<text layer="gamma" matrix="1 0 0 1 576 -40" transformations="translations" pos="0 253.083" stroke="TUMBlack" type="minipage" width="512" height="12.194" depth="5.707" valign="top">Possible reward function:</text>
+<text layer="kappa" matrix="1 0 0 1 576 0" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="13.884" depth="7.41" valign="top">+\phantom{--} $0.40 \cdot d_c$</text>
+<text layer="lambda" matrix="1 0 0 1 576 -32" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="13.7696" depth="7.293" valign="top">--\phantom{+}  $ 0.30 \cdot d_r$</text>
+<text layer="mu" matrix="1 0 0 1 576 -63" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="15.6715" depth="9.217" valign="top">+\phantom{--} $0.20 \cdot \mathds{1}_{d_c = 0} \cdot (1-g)$</text>
+<text layer="nu" matrix="1 0 0 1 576 -96" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="15.6715" depth="9.217" valign="top">+\phantom{--} $0.20 \cdot \mathds{1}_{d_c = 0}\cdot (1-g) \cdot d_b$</text>
+<text layer="alpha" matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 600" stroke="black" type="minipage" width="1216" height="12.194" depth="5.707" valign="top">Which reward should we use?</text>
+<text layer="gamma" matrix="1 0 0 1 0 -40" pin="h" transformations="translations" pos="0 253.083" stroke="TUMBlack" type="minipage" width="576" height="12.194" depth="5.707" valign="top">Desirable Incentives:</text>
+<text layer="delta" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.4495" depth="7.969" valign="top" style="item">Reward vicinity to closest cube</text>
+<text layer="epsilon" matrix="1 0 0 1 0 -32" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="12.194" depth="5.707" valign="top" style="item">Punish distance to other robot arms</text>
+<text layer="zeta" matrix="1 0 0 1 0 -64" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.4495" depth="7.969" valign="top" style="item">Reward grasping while very close to cube</text>
+<text layer="theta" matrix="1 0 0 1 0 -128" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.4495" depth="7.969" valign="top" style="item">Reward relaxing grasp over basket position</text>
+<text layer="iota" matrix="1 0 0 1 0 -160" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="12.194" depth="5.707" valign="top" style="item">Punish hectic motion</text>
+<text layer="eta" matrix="1 0 0 1 0 -96" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.4495" depth="7.969" valign="top" style="item">Reward vicinity to basket with grasped cube</text>
+<text layer="xi" matrix="1 0 0 1 576 -128" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="16.055" depth="9.581" valign="top">+\phantom{--} $0.30 \cdot \mathds{1}_{d_b = 0} \cdot g$</text>
+<text layer="omicron" matrix="1 0 0 1 576 -160.4" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.677" depth="8.203" valign="top">--\phantom{+} $0.10 \cdot \lVert \bm{a} \rVert_2$</text>
+<text layer="pi" matrix="1 0 0 1 576 0" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.1323" depth="7.67" valign="top">+\phantom{--} $0.40 \cdot f_1(d_c)$</text>
+<text matrix="1 0 0 1 576 -32" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.2831" depth="7.813" valign="top">--\phantom{+}  $ 0.30 \cdot f_2(d_r)$</text>
+<text matrix="1 0 0 1 576 -63" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="15.6715" depth="9.217" valign="top">+\phantom{--} $0.20 \cdot \mathds{1}_{d_c = 0} \cdot f_3(1-g)$</text>
+<text matrix="1 0 0 1 576 -96" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="15.6715" depth="9.217" valign="top">+\phantom{--} $0.20 \cdot \mathds{1}_{d_c = 0}\cdot f_4(1-g) \cdot f_5(d_b)$</text>
+<text matrix="1 0 0 1 576 -127.6" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="16.2539" depth="9.802" valign="top">+\phantom{--} $0.30 \cdot \mathds{1}_{d_b = 0} \cdot f_6(g)$</text>
+<text matrix="1 0 0 1 576 -160" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.8902" depth="8.411" valign="top">--\phantom{+} $0.10 \cdot f_7(\lVert \bm{a} \rVert_2)$</text>
+<text layer="rho" matrix="1 0 0 1 576 0" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.1323" depth="7.67" valign="top">+\phantom{--} $0.40 \cdot f_1(d_c)$</text>
+<text matrix="1 0 0 1 576 -32" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.2831" depth="7.813" valign="top">--\phantom{+}  $ 0.30 \cdot f_2(d_r)$</text>
+<text matrix="1 0 0 1 576 -63" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="15.9666" depth="9.503" valign="top">+\phantom{--} $0.20 \cdot \mathds{1}_{d_c &lt; \eps_1} \cdot f_3(1-g)$</text>
+<text matrix="1 0 0 1 576 -96" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="16.0732" depth="9.607" valign="top">+\phantom{--} $0.20 \cdot \mathds{1}_{d_c &lt; \eps_2}\cdot f_4(1-g) \cdot f_5(d_b)$</text>
+<text matrix="1 0 0 1 576 -127.6" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="16.2539" depth="9.802" valign="top">+\phantom{--} $0.30 \cdot \mathds{1}_{d_b &lt; \eps_3} \cdot f_6(g)$</text>
+<text matrix="1 0 0 1 576 -160" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="576" height="14.8902" depth="8.411" valign="top">--\phantom{+} $0.10 \cdot f_7(\lVert \bm{a} \rVert_2)$</text>
 <image layer="alpha" matrix="0.0986764 0 0 0.0986764 1037.21 609.881" rect="0 0 1822 590" bitmap="3"/>
 </page>
 </ipe>
