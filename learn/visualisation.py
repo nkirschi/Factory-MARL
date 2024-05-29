@@ -1,12 +1,12 @@
 import time
 from stable_baselines3 import PPO
-from environments import TaskEnv, SingleDeltaEnv
+from environments import *
 
-env = SingleDeltaEnv(render_mode="human")
+env = SingleDeltaEnvWithNormPenalty(render_mode="human")
 obs, info = env.reset()
 num_episodes = 10
 
-model = PPO.load("single_delta_policy")
+model = PPO.load("policies/single_delta_policy_with_norm_penalty")
 
 frames = []
 for e in range(num_episodes):
@@ -14,8 +14,10 @@ for e in range(num_episodes):
     t = 0
     while True:
         t += 1
-        action = model.predict(obs)[0]
+        action, _states = model.predict(obs)
         obs, reward, terminate, truncate, info = env.step(action)
+        print("action:", action)
+        print("reward:", reward)
         if terminate:
             print(
                 f"Episode {e}, Score: {info['scores']}, FPS: {t / (time.time() - tick):.2f}"
