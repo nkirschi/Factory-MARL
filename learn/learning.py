@@ -31,7 +31,7 @@ if __name__ == "__main__":
                        vec_env_cls=SubprocVecEnv)
     env.reset()
     env = VecVideoRecorder(env,
-                           video_folder=f"videos/{run.name}",
+                           video_folder=f"videos/{run.id}",
                            record_video_trigger=lambda x: x % 1000 == 0,
                            video_length=1000)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
@@ -39,7 +39,7 @@ if __name__ == "__main__":
                 progress_bar=True,
                 callback=WandbCallback(
                     model_save_freq=1000,
-                    model_save_path=f"policies/{run.name}",
+                    model_save_path=f"policies/{run.id}",
                     verbose=2,
                 ))
     run.finish()
