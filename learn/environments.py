@@ -149,4 +149,4 @@ class SingleDeltaEnvWithNormPenalty(TaskEnv):
 
     def _get_reward(self, state, action, info) -> float:
         # Your custom reward function goes here
-        return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(action))
+        return super()._get_reward(state, action, info) + 0.1 * np.exp(-5 * np.linalg.norm(action))
