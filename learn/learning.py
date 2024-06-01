@@ -35,7 +35,6 @@ if __name__ == "__main__":
                            video_length=1000)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
-                progress_bar=True,
                 callback=WandbCallback(
                     gradient_save_freq=1000,
                     model_save_freq=1000,
