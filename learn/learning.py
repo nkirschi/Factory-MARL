@@ -24,8 +24,7 @@ if __name__ == "__main__":
                      config=CONFIG,
                      sync_tensorboard=True,
                      monitor_gym=True,
-                     save_code=True,
-                     dir="~./wandb")
+                     save_code=True)
     env = make_vec_env(lambda: Monitor(CONFIG["env_class"](render_mode="rgb_array")),
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
