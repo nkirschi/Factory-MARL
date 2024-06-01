@@ -5,9 +5,11 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
 from environments import *
 from wandb.integration.sb3 import WandbCallback
 
+import os
 import wandb
 
 if __name__ == "__main__":
+    os.environ["MUJOCO_GL"] = "osmesa"
     CONFIG = {
         "num_envs": 8,
         "env_class": SingleDeltaEnvWithNormPenalty,
