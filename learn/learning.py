@@ -37,6 +37,7 @@ if __name__ == "__main__":
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 progress_bar=True,
                 callback=WandbCallback(
+                    gradient_save_freq=1000,
                     model_save_freq=1000,
                     model_save_path=f"policies/{run.id}",
                     verbose=2,
