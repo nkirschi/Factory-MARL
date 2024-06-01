@@ -1,16 +1,43 @@
 from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.env_util import make_vec_env
-from stable_baselines3.common.vec_env import SubprocVecEnv
+from stable_baselines3.common.monitor import Monitor
+from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
 from environments import *
+from wandb.integration.sb3 import WandbCallback
+
+import wandb
 
 if __name__ == "__main__":
-    NUM_ENVS = 8
-    TOTAL_TIMESTEPS = int(1e7)
-
-    env = make_vec_env(lambda: SingleDeltaEnvWithNormPenalty(render_mode="rgb_array"),
-                       n_envs=NUM_ENVS, vec_env_cls=SubprocVecEnv)
+    CONFIG = {
+        "num_envs": 8,
+        "env_class": SingleDeltaEnvWithNormPenalty,
+        "run_name": "single_delta_policy_with_norm_penalty",
+        "rl_algo": PPO,
+        "total_timesteps": int(1e5),
+        "policy_type": "MlpPolicy",
+    }
+    wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
+    run = wandb.init(project="adlr",
+                     name=CONFIG["run_name"],
+                     config=CONFIG,
+                     sync_tensorboard=True,
+                     monitor_gym=True,
+                     save_code=True,
+                     dir="~./wandb")
+    env = make_vec_env(lambda: Monitor(CONFIG["env_class"](render_mode="rgb_array")),
+                       n_envs=CONFIG["num_envs"],
+                       vec_env_cls=SubprocVecEnv)
     env.reset()
-    model = PPO("MlpPolicy", env, verbose=1)
-    #model = SAC("MlpPolicy", env, verbose=1)
-    model.learn(total_timesteps=TOTAL_TIMESTEPS, progress_bar=True)
-    model.save("policies/single_delta_policy_with_norm_penalty")
+    env = VecVideoRecorder(env,
+                           video_folder=f"videos/{run.name}",
+                           record_video_trigger=lambda x: x % 1000 == 0,
+                           video_length=1000)
+    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1)
+    model.learn(total_timesteps=CONFIG["total_timesteps"],
+                progress_bar=True,
+                callback=WandbCallback(
+                    gradient_save_freq=100,
+                    model_save_path=f"policies/{run.name}",
+                    verbose=2,
+                ))
+    run.finish()
