@@ -1,4 +1,5 @@
 from stable_baselines3 import PPO, SAC
+from stable_baselines3.common.callbacks import ProgressBarCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
@@ -36,9 +37,9 @@ if __name__ == "__main__":
                            video_length=100)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
-                callback=WandbCallback(
+                callback=[WandbCallback(
                     model_save_freq=CONFIG["chkpt_freq"],
                     model_save_path=f"policies/{run.id}",
                     verbose=2,
-                ))
+                ), ProgressBarCallback()])
     run.finish()
