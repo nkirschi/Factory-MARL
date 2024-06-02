@@ -16,7 +16,7 @@ if __name__ == "__main__":
         "env_class": SingleDeltaEnvWithNormPenalty,
         "run_name": "single_delta_policy_with_norm_penalty",
         "rl_algo": PPO,
-        "total_timesteps": int(1e5),
+        "total_timesteps": int(1e7),
         "policy_type": "MlpPolicy",
         "chkpt_freq": 16384,
     }
@@ -33,13 +33,13 @@ if __name__ == "__main__":
     env.reset()
     env = VecVideoRecorder(env,
                            video_folder=f"videos/{run.id}",
-                           record_video_trigger=lambda x: x % CONFIG["chkpt_freq"] == 0,
-                           video_length=100)
+                           record_video_trigger=lambda x: x % 2000 == 0,
+                           video_length=200)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
-                callback=[WandbCallback(
+                callback=[ProgressBarCallback(), WandbCallback(
                     model_save_freq=CONFIG["chkpt_freq"],
                     model_save_path=f"policies/{run.id}",
                     verbose=2,
-                ), ProgressBarCallback()])
+                )])
     run.finish()
