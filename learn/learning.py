@@ -17,6 +17,7 @@ if __name__ == "__main__":
         "rl_algo": PPO,
         "total_timesteps": int(1e5),
         "policy_type": "MlpPolicy",
+        "ckpt_freq": 16384,
     }
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
     run = wandb.init(project="adlr",
@@ -31,13 +32,12 @@ if __name__ == "__main__":
     env.reset()
     env = VecVideoRecorder(env,
                            video_folder=f"videos/{run.id}",
-                           record_video_trigger=lambda x: x % 1000 == 0,
+                           record_video_trigger=lambda x: x % CONFIG["chkpt_freq"] == 0,
                            video_length=100)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 callback=WandbCallback(
-                    gradient_save_freq=1000,
-                    model_save_freq=1000,
+                    model_save_freq=CONFIG["chkpt_freq"],
                     model_save_path=f"policies/{run.id}",
                     verbose=2,
                 ))
