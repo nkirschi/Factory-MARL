@@ -31,10 +31,10 @@ if __name__ == "__main__":
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
     env.reset()
-    env = VecVideoRecorder(env,
-                           video_folder=f"videos/{run.id}",
-                           record_video_trigger=lambda x: x % (CONFIG["chkpt_freq"] / CONFIG["num_envs"]) == 0,
-                           video_length=100)
+    # env = VecVideoRecorder(env,
+    #                        video_folder=f"videos/{run.id}",
+    #                        record_video_trigger=lambda x: x % (CONFIG["chkpt_freq"] / CONFIG["num_envs"]) == 0,
+    #                        video_length=100)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 callback=[ProgressBarCallback(), WandbCallback(
