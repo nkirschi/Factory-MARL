@@ -17,7 +17,7 @@ if __name__ == "__main__":
         "rl_algo": PPO,
         "total_timesteps": int(1e5),
         "policy_type": "MlpPolicy",
-        "ckpt_freq": 16384,
+        "chkpt_freq": 16384,
     }
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
     run = wandb.init(project="adlr",
