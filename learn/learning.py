@@ -22,7 +22,7 @@ if __name__ == "__main__":
     run = wandb.init(project="adlr",
                      name=CONFIG["run_name"],
                      config=CONFIG,
-                     #sync_tensorboard=True,
+                     sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
     env = make_vec_env(lambda: Monitor(CONFIG["env_class"](render_mode="rgb_array")),
@@ -33,10 +33,7 @@ if __name__ == "__main__":
                            video_folder=f"videos/{run.id}",
                            record_video_trigger=lambda x: x % 1000 == 0,
                            video_length=100)
-    model = CONFIG["rl_algo"](CONFIG["policy_type"], env,
-                              verbose=1,
-                              #tensorboard_log=f"runs/{run.id}"
-                              )
+    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 callback=WandbCallback(
                     gradient_save_freq=1000,
