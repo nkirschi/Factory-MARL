@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240604141420" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240604145725" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{Munich, 6. June 2024}
@@ -8488,43 +8488,33 @@ h
 Many robot arms, on both sides of the belt and also upside-down where communication cost is too high to broadcast joint states in real time. \\
 \(\implies\) partial observability (only gripper positions available) \\
 \(\implies\) true \textbf{multi-agent reinforcement learning} (MARL)</text>
-<text layer="gamma" matrix="1 0 0 1 -281.325 -31.8608" transformations="translations" pos="352 176" stroke="black" type="label" width="1076" height="33.7" depth="3.06" valign="baseline" size="Large" style="math">\text{IK}
-\hspace{3.5cm}
-\text{IK} + \text{RL}
-\hspace{3.5cm}
-\text{RL} + \text{RL}
-\hspace{3.5cm}
-\text{MARL}</text>
-<text matrix="1 0 0 1 1.23525 -63.8608" transformations="translations" pos="48 112" stroke="black" type="label" width="81.552" height="23.202" depth="0" valign="baseline">1 arm</text>
-<text matrix="1 0 0 1 150.675 -63.8608" transformations="translations" pos="368 112" stroke="black" type="label" width="94.48" height="23.202" depth="0" valign="baseline">2 arms</text>
-<text matrix="1 0 0 1 92.8916 -63.8608" transformations="translations" pos="944 112" stroke="black" type="label" width="98.58" height="15.56" depth="0" valign="baseline">\(n\) arms</text>
-<path matrix="1 0 0 1 -0.777092 -33.8731" stroke="TUMBlue" pen="fat" arrow="normal/normal">
+<text layer="gamma" matrix="1 0 0 1 -351.079 -54.018" transformations="translations" pos="352 176" stroke="black" type="label" width="1215.14" height="44.984" depth="57.6" valign="baseline" size="Large" style="math">\underbracket{\quad\raisebox{2mm}{IK}\quad}_{\raisebox{-4mm}{\LARGE 1 arm}}
+\hspace{2cm}
+\underbracket{\quad\raisebox{2mm}{IK + RL}
+\quad\hspace{2cm}\quad
+\raisebox{2mm}{RL + RL}\quad}_{\raisebox{-4mm}{\LARGE 2 arms}}
+\hspace{2cm}
+\underbracket{\quad\raisebox{2mm}{MARL}\quad}_{\raisebox{-4mm}{\LARGE{$n$ arms}}}</text>
+<path matrix="0.659202 0 0 1 54.6811 -43.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
 144 192 m
 288 192 l
 </path>
-<path matrix="1 0 0 1 345.806 -33.8731" stroke="TUMBlue" pen="fat" arrow="normal/normal">
-144 192 m
-288 192 l
-</path>
-<path matrix="1 0 0 1 707.154 -33.8731" stroke="TUMBlue" pen="fat" arrow="normal/normal">
-144 192 m
-288 192 l
-</path>
-<text matrix="1 0 0 1 -288.319 -67.2881" transformations="translations" pos="352 176" stroke="black" type="label" width="1091.94" height="-0.034" depth="41.08" valign="baseline" size="Large" style="math">\hphantom{\text{IK}}
-\hspace{3.5cm}
-\underbrace{\hphantom{\text{IK} + \text{RL}}
-\hspace{3.5cm}
-\hphantom{\text{RL} + \text{RL}}}_{}
-\hspace{3.5cm}
-\hphantom{\text{MARL}}</text>
-<path layer="delta" matrix="0.972222 0 0 0.8 8.44444 25.6" stroke="TUMOrange" pen="ultrafat">
+<path layer="delta" matrix="1.00937 0 0 0.771934 -15.233 19.4547" stroke="TUMOrange" pen="ultrafat">
 304 208 m
 304 128 l
 480 128 l
 480 208 l
 h
 </path>
-<text matrix="1 0 0 1 -5.8978 -37.4396" transformations="translations" pos="320 240" stroke="TUMOrange" type="label" width="153.69" height="25.274" depth="0" valign="baseline">we&apos;re here!</text>
+<text matrix="1 0 0 1 -15.7454 -48.9285" transformations="translations" pos="320 240" stroke="TUMOrange" type="label" width="153.69" height="25.274" depth="0" valign="baseline">we&apos;re here!</text>
+<path layer="gamma" matrix="0.659202 0 0 1 421.506 -43.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
+144 192 m
+288 192 l
+</path>
+<path matrix="0.659202 0 0 1 803.102 -43.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
+144 192 m
+288 192 l
+</path>
 </page>
 <page title="The Reward Function">
 <layer name="alpha"/>
