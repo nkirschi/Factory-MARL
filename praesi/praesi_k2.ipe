@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.30">
-<info created="D:20180221134821" modified="D:20240603155533" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240604224307" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{Munich, 6. June 2024}
@@ -7592,7 +7592,7 @@ L5X/6x3gsJzmRu26Am3+zwW3+f9cZNGh5n9ywP8xJcDnLxxnng8tv/JlSD0oPADhH13+6ZMs
 jbF2+Q+XLE4SouFfhvW3YTkNngl8yP9QUJD/zfO/irgIALZicmrn9/uNBrveBTuV/90pvIiC
 9liOSf4nexUQz1UxpLqpR78LuqcvUgUgwj/oKWDXWWhTev/Mz5wmPXBN6f8f+WUZ+A==
 </bitmap>
-<bitmap id="4" width="735" height="383" BitsPerComponent="8" ColorSpace="DeviceRGB" Filter="DCTDecode" length="9171" encoding="base64">
+<bitmap id="5" width="735" height="383" BitsPerComponent="8" ColorSpace="DeviceRGB" Filter="DCTDecode" length="9171" encoding="base64">
 /9j/4AAQSkZJRgABAQIAdgB2AAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQY
 GBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYa
 KCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wgAR
@@ -8456,19 +8456,35 @@ Multi-agent \\Reinforcement Learning</text>
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
 <image layer="alpha" matrix="0.567101 0 0 0.567101 619.289 11.2886" rect="0 0 1024 1024" bitmap="3"/>
-<text matrix="1 0 0 1 0 -9" pin="h" transformations="translations" pos="0 600" stroke="TUMBlack" type="minipage" width="624" height="296.1" depth="286.84" valign="top" style="itemize">\item 2 or more robot arms
+<text matrix="1 0 0 1 0 -9" pin="h" transformations="translations" pos="0 600" stroke="TUMBlack" type="minipage" width="624" height="245.578" depth="236.18" valign="top" style="itemize">\item Gym environment based on MuJoCo (Howell et al. 2022)
+\vspace*{-0.5em}
+\item 2 or more robot arms
+\vspace*{-0.5em}
 \item basket in reach for each arm
+\vspace*{-0.5em}
 \item conveyor belt with increasing speed \quad $\rightarrow$ shall be put into the basket
+\vspace*{-0.5em}
 \item cubes transported on the conveyor belt
+\vspace*{-0.5em}
 \item arms must not hit each other/environment
+\vspace*{-0.5em}
 \item 8 degrees of freedom
-\item arms use RL to learn deviation from inverse kinematics base policy</text>
-<image matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+</text>
+<image matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
+</page>
+<page title="The Setting">
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<image layer="alpha" matrix="0.567101 0 0 0.567101 619.289 11.2886" rect="0 0 1024 1024" bitmap="3"/>
+<text matrix="1 0 0 1 0 -9" pin="h" transformations="translations" pos="0 600" stroke="TUMBlack" type="minipage" width="624" height="60.774" depth="50.9" valign="top" style="itemize">\item Conventional pre-programming-based approaches too inflexible and tedious
+\\ $\rightarrow$ use of MARL</text>
+<image matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
+<text pin="h" transformations="translations" pos="0 447.326" stroke="black" type="minipage" width="592" height="66.022" depth="56.18" valign="top">(cp. Pérez-Francisco et al. 1998, Bozma and Kalalıoğlu 2012, Yu et al. 2017, Han et al. 2020) </text>
 </page>
 <page title="Goal of the project">
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
-<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
 <text transformations="translations" pos="400 320" stroke="black" type="label" width="152.464" height="25.274" depth="0" valign="baseline">Motivation</text>
 </page>
 <page title="The Reward Function">
@@ -8494,7 +8510,7 @@ h
 <text layer="gamma" matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 430.744" stroke="TUMBlack" type="minipage" width="1216" height="21.11" depth="11.14" valign="top">Sparse reward</text>
 <text matrix="1 0 0 1 0 16" pin="h" transformations="translations" pos="0 350.496" stroke="TUMBlack" type="minipage" width="1216" height="20.92" depth="10.96" valign="top" style="item">\quad $\rightarrow$ \red{Almost no learning possible}</text>
 <text matrix="1 0 0 1 -112 32" transformations="translations" pos="832 208" stroke="TUMBlack" type="label" width="396.216" height="25.276" depth="0" valign="top" style="math">Hier könnte ihr Foto stehen</text>
-<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
 </page>
 <page title="The Reward Function">
 <layer name="alpha"/>
@@ -8539,7 +8555,7 @@ h
 <text layer="theta" matrix="1 0 0 1 0 -15" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="704" height="21.11" depth="11.14" valign="top" style="item">Reward relaxing grasp over basket</text>
 <text layer="iota" matrix="1 0 0 1 0 -64" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="704" height="17.614" depth="7.66" valign="top" style="item">Punish hectic motion</text>
 <text layer="eta" matrix="1 0 0 1 0 34" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="1104" height="21.11" depth="11.14" valign="top" style="item">Reward vicinity to basket with grasped cube</text>
-<image layer="sigma" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+<image layer="sigma" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
 </page>
 <page title="The Reward Function">
 <layer name="alpha"/>
@@ -8607,16 +8623,16 @@ h
 <text pin="h" transformations="translations" pos="0 343.411" stroke="TUMBlack" type="minipage" width="1216" height="27.116" depth="17.16" valign="top" style="center">$r = \sum_{i=0}^6 \omega_i I_i$</text>
 <text pin="h" transformations="translations" pos="0 267.135" stroke="TUMBlack" type="minipage" width="1216" height="21.11" depth="11.14" valign="top">with $\omega_i$ scaling factor as hyperparameter</text>
 <text matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 225.135" stroke="TUMBlack" type="minipage" width="1216" height="21.11" depth="11.14" valign="top">Start with equal $\omega_i$, goal: $\omega_0 &gt;&gt; \omega_i$, ideally most $\omega_i = 0$ </text>
-<image matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+<image matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
 </page>
 <page title="First results">
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
-<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
 </page>
 <page title="Next steps">
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
-<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="4"/>
+<image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="5"/>
 </page>
 </ipe>
