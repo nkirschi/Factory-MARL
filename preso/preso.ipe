@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240605162352" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240605162440" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{6 June 2024}
@@ -20224,7 +20224,7 @@ h
 288 192 l
 </path>
 <text layer="gamma" matrix="1 0 0 1 0 48.0518" transformations="translations" pos="0 240" stroke="black" type="minipage" width="976" height="49.422" depth="39.52" valign="top" style="itemize">\setlength{\itemsep}{0em}
-\item simplification: learn deviation from IK base policy
+\item simplification: only learn \emph{deviation} from IK base policy
 \item roadmap: incremental approach</text>
 </page>
 <page title="Reward Design">
