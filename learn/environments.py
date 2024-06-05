@@ -153,3 +153,22 @@ class SingleDeltaEnvWithNormPenalty(TaskEnv):
     def _get_reward(self, state, action, info) -> float:
         # Your custom reward function goes here
         return super()._get_reward(state, action, info) + 0.1 * np.exp(-5 * np.linalg.norm(action))
+
+class SingleDeltaEnvWithNormPenaltyFixed(TaskEnv):
+    def __init__(
+        self,
+        render_mode: Optional[str] = None,
+        seed: Optional[int] = None,
+        width=1024,
+        height=1024
+    ):
+        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self.ik_policy0.act()
+        action_arm1 = self.ik_policy1.act() + 0.5 * self._process_action(rl_action)
+        return action_arm0, action_arm1
+
+    def _get_reward(self, state, action, info) -> float:
+        # Your custom reward function goes here
+        return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(self._process_action(action)))
