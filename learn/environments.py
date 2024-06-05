@@ -13,14 +13,15 @@ class TaskEnv(BaseEnv):
         self,
         render_mode: Optional[str] = None,
         seed: Optional[int] = None,
-        window_size=1024
+        width=1024,
+        height=1024
     ):
         """
         This class defines a custom task environment, including custom observation and action spaces,
         and a custom reward function. It inherits from BaseEnv, which is a subclass of gym.Env.
         """
 
-        super().__init__(render_mode=render_mode, seed=seed, width=window_size, height=window_size)
+        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
 
         self.ik_policy0 = IKPolicy(self, arm_id=0)
         self.ik_policy1 = IKPolicy(self, arm_id=1)
@@ -123,9 +124,10 @@ class SingleDeltaEnv(TaskEnv):
         self,
         render_mode: Optional[str] = None,
         seed: Optional[int] = None,
-        window_size=1024
+        width=1024,
+        height=1024
     ):
-        super().__init__(render_mode=render_mode, seed=seed, window_size=window_size)
+        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
 
     def _compose_control(self, rl_action):
         action_arm0 = self.ik_policy0.act()
@@ -138,9 +140,10 @@ class SingleDeltaEnvWithNormPenalty(TaskEnv):
         self,
         render_mode: Optional[str] = None,
         seed: Optional[int] = None,
-        window_size=1024
+        width=1024,
+        height=1024
     ):
-        super().__init__(render_mode=render_mode, seed=seed, window_size=window_size)
+        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
 
     def _compose_control(self, rl_action):
         action_arm0 = self.ik_policy0.act()
