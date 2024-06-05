@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240605162440" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240605163102" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{6 June 2024}
@@ -20321,11 +20321,12 @@ h
 <layer name="alpha"/>
 <layer name="BACKGROUND"/>
 <layer name="beta"/>
-<view layers="alpha" active="BACKGROUND"/>
+<view layers="alpha" active="alpha"/>
 <text layer="alpha" matrix="1 0 0 1 24 -41.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="616" height="23.932" depth="13.98" valign="top" size="LARGE">Discussion time!</text>
 <text layer="beta" matrix="1 0 0 1 264 -185.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="504" height="21.82" depth="11.88" valign="top" size="Large">an Animation!</text>
 <text matrix="1 0 0 1 -8 -5" transformations="translations" pos="272 240" stroke="black" type="label" width="60.492" height="25.274" depth="0" valign="baseline">with</text>
 <image layer="alpha" matrix="0.817072 0 0 0.817072 692.708 -18.131" rect="0 0 638 848" bitmap="4"/>
 <image matrix="0.391671 0 0 0.391671 18.164 432" rect="0 0 740 390" bitmap="1"/>
+<text matrix="1 0 0 1 -81.7252 111.483" transformations="translations" pos="400 432" stroke="TUMBlue" type="minipage" width="736" height="60.96" depth="51.12" valign="top" size="huge">\bfseries\scalebox{2.7}{ultuous}</text>
 </page>
 </ipe>
