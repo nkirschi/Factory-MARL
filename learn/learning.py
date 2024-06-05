@@ -10,13 +10,13 @@ import os
 import wandb
 
 if __name__ == "__main__":
-    os.environ["MUJOCO_GL"] = "osmesa"
+    #os.environ["MUJOCO_GL"] = "osmesa"
     CONFIG = {
         "num_envs": 8,
-        "env_class": SingleDeltaEnvWithNormPenalty,
+        "env_class": SingleDeltaEnvWithNormPenaltyFixed,
         "run_name": "single_delta_policy_with_norm_penalty",
         "rl_algo": PPO,
-        "total_timesteps": int(1e7),
+        "total_timesteps": int(1e6),
         "policy_type": "MlpPolicy",
         "chkpt_freq": 16384,
     }
