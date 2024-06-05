@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240605154931" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240605160213" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{6 June 2024}
@@ -20125,8 +20125,8 @@ h
       \end{tikzpicture}}}}
   </preamble>
 <layout paper="1280 720" origin="32 40" frame="1216 600" skip="32" crop="no"/>
-<pagenumberstyle pos="1230 -28" color="UPgray150" size="normal" halign="right" valign="baseline">\arabic{ipePage}</pagenumberstyle>
-<titlestyle pos="0 620" size="Huge" color="UPgray150"  valign="baseline"/>
+<pagenumberstyle pos="1215 -28" color="UPgray150" size="footnote" halign="right" valign="baseline">\arabic{ipePage}</pagenumberstyle>
+<titlestyle pos="0 620" size="LARGE" color="UPgray150"  valign="baseline"/>
 </ipestyle>
 <page>
 <layer name="alpha"/>
@@ -20140,7 +20140,7 @@ Multi-agent \\Reinforcement Learning</text>
 (Team 7)</text>
 <text layer="beta" matrix="1 0 0 1 264 -185.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="504" height="21.82" depth="11.88" valign="top" size="Large">an Animation!</text>
 <text matrix="1 0 0 1 -8 -5" transformations="translations" pos="272 240" stroke="black" type="label" width="60.492" height="25.274" depth="0" valign="baseline">with</text>
-<image layer="alpha" matrix="0.817072 0 0 0.817072 708.708 -18.131" rect="0 0 638 848" bitmap="4"/>
+<image layer="alpha" matrix="0.817072 0 0 0.817072 692.708 -18.131" rect="0 0 638 848" bitmap="4"/>
 <image matrix="0.391671 0 0 0.391671 18.164 432" rect="0 0 740 390" bitmap="1"/>
 </page>
 <page title="Problem Setting">
@@ -20195,33 +20195,34 @@ h
 Many robot arms, on both sides of the belt and also upside-down where communication cost is too high to broadcast joint states in real time. \\
 \(\implies\) partial observability (only gripper positions available) \\
 \(\implies\) true \textbf{multi-agent reinforcement learning} (MARL)</text>
-<text layer="gamma" matrix="1 0 0 1 -351.079 -54.018" transformations="translations" pos="352 176" stroke="black" type="label" width="1215.14" height="44.984" depth="57.6" valign="baseline" size="Large" style="math">\underbracket{\quad\raisebox{2mm}{IK}\quad}_{\raisebox{-4mm}{\LARGE 1 arm}}
+<text layer="gamma" matrix="1 0 0 1 -351.079 -70.018" transformations="translations" pos="352 176" stroke="black" type="label" width="1215.14" height="44.984" depth="57.6" valign="baseline" size="Large" style="math">\underbracket{\quad\raisebox{2mm}{IK}\quad}_{\raisebox{-4mm}{\LARGE 1 arm}}
 \hspace{2cm}
 \underbracket{\quad\raisebox{2mm}{IK + RL}
 \quad\hspace{2cm}\quad
 \raisebox{2mm}{RL + RL}\quad}_{\raisebox{-4mm}{\LARGE 2 arms}}
 \hspace{2cm}
 \underbracket{\quad\raisebox{2mm}{MARL}\quad}_{\raisebox{-4mm}{\LARGE{$n$ arms}}}</text>
-<path matrix="0.659202 0 0 1 54.6811 -43.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
+<path matrix="0.659202 0 0 1 54.6811 -59.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
 144 192 m
 288 192 l
 </path>
-<path layer="delta" matrix="1.00937 0 0 0.771934 -15.233 19.4547" stroke="TUMOrange" pen="ultrafat">
+<path layer="delta" matrix="1.00937 0 0 0.771934 -15.233 3.4547" stroke="TUMOrange" pen="ultrafat">
 304 208 m
 304 128 l
 480 128 l
 480 208 l
 h
 </path>
-<text matrix="1 0 0 1 -15.7454 -48.9285" transformations="translations" pos="320 240" stroke="TUMOrange" type="label" width="153.69" height="25.274" depth="0" valign="baseline">we&apos;re here!</text>
-<path layer="gamma" matrix="0.659202 0 0 1 421.506 -43.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
+<text matrix="1 0 0 1 -15.7454 -64.9285" transformations="translations" pos="320 240" stroke="TUMOrange" type="label" width="153.69" height="25.274" depth="0" valign="baseline">we&apos;re here!</text>
+<path layer="gamma" matrix="0.659202 0 0 1 421.506 -59.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
 144 192 m
 288 192 l
 </path>
-<path matrix="0.659202 0 0 1 803.102 -43.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
+<path matrix="0.659202 0 0 1 803.102 -59.7207" stroke="TUMBlue" pen="fat" arrow="normal/normal">
 144 192 m
 288 192 l
 </path>
+<text matrix="1 0 0 1 0 -5.76517" transformations="translations" pos="0 240" stroke="black" type="minipage" width="336" height="21.11" depth="11.14" valign="top">Roadmap:</text>
 </page>
 <page title="Reward Design">
 <layer name="alpha"/>
@@ -20240,7 +20241,7 @@ h
 h
 </path>
 <text matrix="1 0 0 1 16 -20" transformations="translations" pos="0 534.099" stroke="TUMBlue" type="minipage" width="1184" height="19.858" depth="9.9" valign="top">1st intention: reward of \blue{1 if block is thrown in the basket}, else 0</text>
-<image matrix="0.708517 0 0 0.708517 561.923 8.05209" rect="308 0 908 600" bitmap="6"/>
+<image matrix="0.721269 0 0 0.721269 560.512 0.400838" rect="308 0 908 600" bitmap="6"/>
 </page>
 <page title="Reward Design">
 <layer name="alpha"/>
@@ -20285,11 +20286,11 @@ h
 <text layer="iota" matrix="1 0 0 1 0 -80" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="704" height="21.11" depth="11.14" valign="top" style="item">$I_6$: Reward relaxing grasp over basket</text>
 <text layer="eta" matrix="1 0 0 1 0 18" pin="h" transformations="translations" pos="0 182.664" stroke="TUMBlack" type="minipage" width="1104" height="21.11" depth="11.14" valign="top" style="item">$I_4$: Reward grasping while very close to cube</text>
 <image layer="sigma" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="10"/>
-<text matrix="1 0 0 1 -112.574 -15.3098" transformations="translations" pos="912 320" stroke="TUMBlack" type="minipage" width="224" height="23.812" depth="13.88" valign="top">$r = \sum_{i=0}^6 \omega_i I_i$</text>
+<text matrix="1 0 0 1 -29.9643 9.54622" transformations="translations" pos="912 320" stroke="TUMBlack" type="minipage" width="224" height="42.68" depth="32.76" valign="top" style="center">$r = \displaystyle\sum_{i=0}^6 \omega_i I_i$</text>
 <text matrix="1 0 0 1 -1.22808 105.4" transformations="translations" pos="768 288" stroke="TUMBlack" type="minipage" width="64" height="168.124" depth="158.54" valign="top">$\begin{rcases}
 \vspace*{5cm}
 \end{rcases}$</text>
-<text matrix="1 0 0 1 -32.7863 63.0203" transformations="translations" pos="832 176" stroke="TUMBlack" type="minipage" width="416" height="49.422" depth="39.52" valign="top" style="itemize">\setlength{\itemsep}{0em}
+<text matrix="1 0 0 1 -32.7863 49.8612" transformations="translations" pos="832 176" stroke="TUMBlack" type="minipage" width="416" height="49.422" depth="39.52" valign="top" style="itemize">\setlength{\itemsep}{0em}
 \item goal: $\omega_0 &gt;&gt; \omega_i$ for $i \ge 1$
 \item ideally most $\omega_i = 0$ </text>
 <text matrix="1 0 0 1 0 205.314" pin="h" transformations="translations" pos="0 182.664" stroke="TUMGray" type="minipage" width="768" height="21.11" depth="11.14" valign="top" style="item">$I_0$: Reward cubes put into basked</text>
@@ -20298,10 +20299,10 @@ h
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
 <image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="10"/>
-<image matrix="0.445127 0 0 0.445127 16.3809 272.048" rect="36.9157 0 1179.08 600" bitmap="3"/>
-<image matrix="0.445147 0 0 0.445147 16.3801 9.03197" rect="36.9157 0 1179.08 600" bitmap="8"/>
-<image matrix="0.813367 0 0 0.813367 403.696 99.8153" rect="233 0 983 600" bitmap="7"/>
-<text matrix="1 0 0 1 0 38.0431" transformations="translations" pos="592 48" stroke="black" type="minipage" width="608" height="43.652" depth="33.76" valign="top">learnt RL policy steers IK base policy away from other arm (undesired)</text>
+<image matrix="0.445127 0 0 0.445127 1.85506 272.048" rect="36.9157 0 1179.08 600" bitmap="3"/>
+<image matrix="0.445147 0 0 0.445147 1.85426 9.03197" rect="36.9157 0 1179.08 600" bitmap="8"/>
+<image matrix="0.813367 0 0 0.813367 416.043 99.8153" rect="233 0 983 600" bitmap="7"/>
+<text matrix="1 0 0 1 15.9784 38.0431" transformations="translations" pos="592 48" stroke="black" type="minipage" width="608" height="43.652" depth="33.76" valign="top">learnt RL policy steers IK base policy away from other arm (undesired)</text>
 <text matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 600" stroke="black" type="minipage" width="1216" height="21.108" depth="11.14" valign="top">PPO for $\omega_0, \omega_1 &gt; 0$ and $\omega_2, \dots \omega_6 = 0$</text>
 </page>
 <page title="Next Steps">
@@ -20321,7 +20322,7 @@ h
 <text layer="alpha" matrix="1 0 0 1 24 -41.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="616" height="23.932" depth="13.98" valign="top" size="LARGE">Discussion time!</text>
 <text layer="beta" matrix="1 0 0 1 264 -185.445" transformations="translations" pos="0 416" stroke="black" type="minipage" width="504" height="21.82" depth="11.88" valign="top" size="Large">an Animation!</text>
 <text matrix="1 0 0 1 -8 -5" transformations="translations" pos="272 240" stroke="black" type="label" width="60.492" height="25.274" depth="0" valign="baseline">with</text>
-<image layer="alpha" matrix="0.817072 0 0 0.817072 708.708 -18.131" rect="0 0 638 848" bitmap="4"/>
+<image layer="alpha" matrix="0.817072 0 0 0.817072 692.708 -18.131" rect="0 0 638 848" bitmap="4"/>
 <image matrix="0.391671 0 0 0.391671 18.164 432" rect="0 0 740 390" bitmap="1"/>
 </page>
 </ipe>
