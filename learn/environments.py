@@ -122,53 +122,20 @@ class TaskEnv(BaseEnv):
 class SingleDeltaEnv(TaskEnv):
     def __init__(
         self,
-        render_mode: Optional[str] = None,
-        seed: Optional[int] = None,
-        width=1024,
-        height=1024
+        score_weight,
+        norm_penalty_weight,
+        **kwargs
     ):
-        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
+        super().__init__(**kwargs)
+        self.score_weight = score_weight
+        self.norm_penalty_weight = norm_penalty_weight
 
     def _compose_control(self, rl_action):
-        action_arm0 = self.ik_policy0.act()
-        action_arm1 = self.ik_policy1.act() + self._process_action(rl_action)
+        action_arm0 = self.ik_policy0.act() + 0.5 * self._process_action(rl_action)
+        action_arm1 = self.ik_policy1.act()
         return action_arm0, action_arm1
 
-
-class SingleDeltaEnvWithNormPenalty(TaskEnv):
-    def __init__(
-        self,
-        render_mode: Optional[str] = None,
-        seed: Optional[int] = None,
-        width=1024,
-        height=1024
-    ):
-        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
-
-    def _compose_control(self, rl_action):
-        action_arm0 = self.ik_policy0.act()
-        action_arm1 = self.ik_policy1.act() + self._process_action(rl_action)
-        return action_arm0, action_arm1
-
-    def _get_reward(self, state, action, info) -> float:
+    def _get_reward(self, state, rl_action, info) -> float:
         # Your custom reward function goes here
-        return super()._get_reward(state, action, info) + 0.1 * np.exp(-5 * np.linalg.norm(action))
-
-class SingleDeltaEnvWithNormPenaltyFixed(TaskEnv):
-    def __init__(
-        self,
-        render_mode: Optional[str] = None,
-        seed: Optional[int] = None,
-        width=1024,
-        height=1024
-    ):
-        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
-
-    def _compose_control(self, rl_action):
-        action_arm0 = self.ik_policy0.act()
-        action_arm1 = self.ik_policy1.act() + 0.5 * self._process_action(rl_action)
-        return action_arm0, action_arm1
-
-    def _get_reward(self, state, action, info) -> float:
-        # Your custom reward function goes here
-        return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(self._process_action(action)))
+        return self.score_weight * super()._get_reward(state, rl_action, info)\
+            + self.norm_penalty_weight * np.exp(-np.linalg.norm(self._process_action(rl_action)))
