@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240605163102" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240606105301" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{6 June 2024}
@@ -20313,8 +20313,9 @@ h
 <layer name="beta"/>
 <view layers="alpha" active="alpha"/>
 <image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="10"/>
-<text transformations="translations" pos="0 576" stroke="black" type="minipage" width="1216" height="91.194" depth="81.42" valign="top" style="itemize">\item explore denser reward augmentations
-\item employ RL for 2nd arm as well
+<text transformations="translations" pos="0 576" stroke="black" type="minipage" width="1216" height="126.236" depth="116.56" valign="top" style="itemize">\item explore denser reward augmentations
+\item use other algos/modifications for sparse case
+\item introduce RL for 2nd arm as well
 \item construct multi-agent env</text>
 </page>
 <page>
