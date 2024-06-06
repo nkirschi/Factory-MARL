@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20180221134821" modified="D:20240606105301" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
+<info created="D:20180221134821" modified="D:20240606162430" title="Factory Manipulation with Cooperative MARL" author="Nikolas Kirschstein, Kassian Köck" numberpages="yes" tex="pdftex"/>
 <preamble>\newcommand{\presenter}{Kirschstein, Köck}
 \newcommand{\prestitle}{Factory Manipulation with Cooperative MARL}
 \newcommand{\presdate}{6 June 2024}
@@ -20178,10 +20178,6 @@ Han et al. 2020)</text>
 <layer name="gamma"/>
 <layer name="delta"/>
 <layer name="epsilon"/>
-<view layers="alpha" active="alpha"/>
-<view layers="alpha beta" active="beta"/>
-<view layers="alpha beta gamma" active="gamma"/>
-<view layers="alpha beta gamma delta" active="delta"/>
 <view layers="alpha beta gamma delta epsilon" active="epsilon"/>
 <image layer="alpha" matrix="0.151309 0 0 0.151309 1103.79 608.678" rect="0 0 735 383" bitmap="10"/>
 <text matrix="1 0 0 1 0 -16" pin="h" transformations="translations" pos="0 600" stroke="black" type="minipage" width="1216" height="43.652" depth="33.76" valign="top">Multiple robot arms cooperating to maximise efficiency in factory manipulation task \\
@@ -20246,7 +20242,7 @@ h
 <text matrix="1 0 0 1 16 -20" transformations="translations" pos="0 534.099" stroke="TUMBlue" type="minipage" width="1184" height="19.858" depth="9.9" valign="top">1st intention: reward of \blue{1 if block is thrown in the basket}, else 0</text>
 <image matrix="0.721269 0 0 0.721269 560.512 0.400838" rect="308 0 908 600" bitmap="6"/>
 </page>
-<page title="Reward Design">
+<page title="Reward Design (cont&apos;d)">
 <layer name="alpha"/>
 <layer name="beta"/>
 <layer name="gamma"/>
