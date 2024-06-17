@@ -70,9 +70,9 @@ if __name__ == "__main__":
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
                 callback=[  # ProgressBarCallback(),
-                    CheckpointCallback(save_freq=CONFIG["chkpt_freq"],
+                    CheckpointCallback(save_freq=CONFIG["chkpt_interval"],
                                        save_path=f"policies/{run.id}"),
-                    WandbCallback(model_save_freq=CONFIG["chkpt_freq"],
+                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"],
                                   model_save_path=f"policies/{run.id}",
                                   verbose=2)])
     run.finish()
