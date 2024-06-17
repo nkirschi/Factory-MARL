@@ -16,12 +16,12 @@ if __name__ == "__main__":
         "num_envs": 8,
         "env_class": SingleDeltaEnv,
         "run_name": "single_delta_policy_with_norm_penalty",
-        "rl_algo": PPO,
+        "rl_algo": SAC,
         "total_timesteps": int(1e6),
         "policy_type": "MlpPolicy",
         "chkpt_freq": 16384,
         "score_weight": 1,
-        "norm_penalty_weight": 1
+        "norm_penalty_weight": 0.1
     }
 
 
