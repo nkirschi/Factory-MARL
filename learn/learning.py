@@ -34,7 +34,7 @@ if __name__ == "__main__":
     CONFIG = {
         "num_envs": 4,
         "env_class": SingleDeltaEnv,
-        "notes": "SAC with true score reward signal",
+        "notes": "SAC with true score reward signal",  # adjust this before every run
         "rl_algo": SAC,
         "total_timesteps": int(1e6),
         "log_interval": 5,  # for on-policy algos: #steps, for off-policy algos: #episodes
