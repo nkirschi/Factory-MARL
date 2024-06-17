@@ -20,17 +20,12 @@ class AdditionalMetricsCallback(BaseCallback):
         super().__init__()
 
     def _on_step(self) -> bool:
-        print("entered on_step")
-        print("condition met")
         try:
-            env = self.training_env
-            scores = env.get_attr("last_score")
+            scores = self.training_env.get_attr("last_score")
             avg_total_score = sum(map(sum, scores)) / len(scores)
-            print(avg_total_score)
             self.logger.record("rollout/ep_score_last", avg_total_score)
-            print("try successful")
         except AttributeError:
-            print("except")
+            raise AssertionError("Property last_score not present in env object", self.training_env)
         return True
 
 
