@@ -1,12 +1,12 @@
 import time
-from stable_baselines3 import PPO
+from stable_baselines3 import PPO, SAC
 from environments import *
 
 env = SingleDeltaEnv(1, 1, render_mode="human")
 obs, info = env.reset()
 num_episodes = 10
 
-model = PPO.load("policies/single_delta_policy_with_norm_penalty_pos_reward.zip")
+model = SAC.load("policies/SAC_1_1")
 
 frames = []
 for e in range(num_episodes):
