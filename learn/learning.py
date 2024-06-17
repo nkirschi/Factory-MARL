@@ -74,5 +74,6 @@ if __name__ == "__main__":
                                        save_path=f"policies/{run.id}"),
                     WandbCallback(model_save_freq=CONFIG["chkpt_interval"],
                                   model_save_path=f"policies/{run.id}",
-                                  verbose=2)])
+                                  verbose=2),
+                    AdditionalMetricsCallback()])
     run.finish()
