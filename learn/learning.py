@@ -22,7 +22,8 @@ class AdditionalMetricsCallback(BaseCallback):
     def _on_step(self) -> bool:
         env = self.training_env
         try:
-            self.logger.record("ep_score_last", env.last_score)
+            self.logger.record("rollout/ep_score_last", env.last_score)
+            print("logged ")
         except AttributeError:
             pass
         return True
@@ -40,7 +41,7 @@ if __name__ == "__main__":
         "chkpt_interval": int(1e6 / 10),
         "policy_type": "MlpPolicy",
         "score_weight": 1,
-        "norm_penalty_weight": 0.1
+        "norm_penalty_weight": 0
     }
 
 
@@ -64,15 +65,15 @@ if __name__ == "__main__":
     env.reset()
     env = VecVideoRecorder(env,
                            video_folder=f"videos/{run.id}",
-                           record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] / CONFIG["num_envs"]) == 0,
+                           record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
                            video_length=100)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
                 callback=[  # ProgressBarCallback(),
-                    CheckpointCallback(save_freq=CONFIG["chkpt_interval"],
+                    CheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                        save_path=f"policies/{run.id}"),
-                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"],
+                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                   model_save_path=f"policies/{run.id}",
                                   verbose=2),
                     AdditionalMetricsCallback()])
