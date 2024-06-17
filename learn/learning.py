@@ -16,16 +16,21 @@ class AdditionalMetricsCallback(BaseCallback):
     Custom callback for plotting additional metrics in tensorboard.
     """
 
-    def __init__(self, verbose=0):
-        super().__init__(verbose)
+    def __init__(self, log_interval):
+        self.log_interval = log_interval
+        super().__init__()
 
     def _on_step(self) -> bool:
-        env = self.training_env
-        try:
-            self.logger.record("rollout/ep_score_last", env.last_score)
-            print("logged ")
-        except AttributeError:
-            pass
+        print("entered on_step")
+        if self.num_timesteps % self.log_interval == 0:
+            print("condition met")
+            env = self.training_env
+            try:
+                self.logger.record("rollout/ep_score_last", env.last_score)
+                self.logger.dump(self.num_timesteps)
+                print("try successful")
+            except AttributeError:
+                print("except")
         return True
 
 
@@ -76,5 +81,5 @@ if __name__ == "__main__":
                     WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                   model_save_path=f"policies/{run.id}",
                                   verbose=2),
-                    AdditionalMetricsCallback()])
+                    AdditionalMetricsCallback(log_interval=CONFIG["log_interval"])])
     run.finish()
