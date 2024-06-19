@@ -53,6 +53,8 @@ if __name__ == "__main__":
 
 
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
+    wandb.save("policies_sb3/*")
+    wandb.save("policies_wandb/*")
     run = wandb.init(project="adlr",
                      notes=CONFIG["notes"],
                      config=CONFIG,
@@ -72,9 +74,10 @@ if __name__ == "__main__":
                 log_interval=CONFIG["log_interval"],
                 callback=[  # ProgressBarCallback(),
                     CheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                       save_path=f"policies/{run.id}"),
+                                       save_path=f"policies_sb3/{run.id}"),
                     WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                  model_save_path=f"policies/{run.id}",
+                                  model_save_path=f"policies_wandb/{run.id}",
                                   verbose=2),
                     AdditionalMetricsCallback()])
+
     run.finish()
