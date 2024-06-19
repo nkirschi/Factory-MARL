@@ -60,9 +60,9 @@ if __name__ == "__main__":
                      monitor_gym=True,
                      save_code=True)
     os.makedirs("policies_sb3", exist_ok=True)
-    wandb.save("policies_sb3/*")
+    wandb.save(f"policies_sb3/{run.id}/*")
     os.makedirs("policies_wandb", exist_ok=True)
-    wandb.save("policies_wandb/*")
+    wandb.save(f"policies_wandb/{run.id}/*")
     env = make_vec_env(make_env,
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
