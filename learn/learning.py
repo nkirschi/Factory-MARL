@@ -53,14 +53,14 @@ if __name__ == "__main__":
 
 
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
-    wandb.save("policies_sb3/*")
-    wandb.save("policies_wandb/*")
     run = wandb.init(project="adlr",
                      notes=CONFIG["notes"],
                      config=CONFIG,
                      sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
+    wandb.save("policies_sb3/*")
+    wandb.save("policies_wandb/*")
     env = make_vec_env(make_env,
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
