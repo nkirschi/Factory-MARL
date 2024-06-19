@@ -21,7 +21,7 @@ class AdditionalMetricsCallback(BaseCallback):
 
     def _on_step(self) -> bool:
         try:
-            scores = self.training_env.get_attr("last_score")
+            scores = self.training_env.unwrapped.last_score
             avg_total_score = sum(map(sum, scores)) / len(scores)
             self.logger.record("rollout/ep_score_last", avg_total_score)
         except AttributeError:
