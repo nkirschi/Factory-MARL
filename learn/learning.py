@@ -59,7 +59,9 @@ if __name__ == "__main__":
                      sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
+    os.makedirs("policies_sb3", exist_ok=True)
     wandb.save("policies_sb3/*")
+    os.makedirs("policies_wandb", exist_ok=True)
     wandb.save("policies_wandb/*")
     env = make_vec_env(make_env,
                        n_envs=CONFIG["num_envs"],
