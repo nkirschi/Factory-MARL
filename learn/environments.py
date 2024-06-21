@@ -133,9 +133,10 @@ class SingleDeltaEnv(TaskEnv):
         self.norm_penalty_weight = norm_penalty_weight
 
     def _compose_control(self, rl_action):
-        action_arm0 = self.ik_policy0.act() + 0.5 * self._process_action(rl_action)
+        ik_action0, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
         # TODO: debug output of act() and force-clip if necessary
-        action_arm1 = self.ik_policy1.act()
+        action_arm1 = ik_action1
         return action_arm0, action_arm1
 
     def _get_reward(self, state, rl_action, info) -> float:
