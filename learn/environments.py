@@ -10,11 +10,11 @@ from challenge_env.ik_policy import IKPolicy
 
 class TaskEnv(BaseEnv):
     def __init__(
-        self,
-        render_mode: Optional[str] = None,
-        seed: Optional[int] = None,
-        width=1024,
-        height=1024
+            self,
+            render_mode: Optional[str] = None,
+            seed: Optional[int] = None,
+            width=1024,
+            height=1024
     ):
         """
         This class defines a custom task environment, including custom observation and action spaces,
@@ -91,7 +91,7 @@ class TaskEnv(BaseEnv):
         return reward
 
     def step(
-        self, action: np.ndarray
+            self, action: np.ndarray
     ) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
         action_arm0, action_arm1 = self._compose_control(action)
 
@@ -107,10 +107,10 @@ class TaskEnv(BaseEnv):
         return obs, reward, terminate, False, info
 
     def reset(
-        self,
-        *,
-        seed: Optional[int] = None,
-        options: Optional[Dict[str, Any]] = None,
+            self,
+            *,
+            seed: Optional[int] = None,
+            options: Optional[Dict[str, Any]] = None,
     ) -> Tuple[np.ndarray, Dict[str, Any]]:
         state, info = self.reset_sim(seed=seed)
         self.ik_policy0.reset()
@@ -123,10 +123,10 @@ class TaskEnv(BaseEnv):
 
 class SingleDeltaEnv(TaskEnv):
     def __init__(
-        self,
-        score_weight,
-        norm_penalty_weight,
-        **kwargs
+            self,
+            score_weight,
+            norm_penalty_weight,
+            **kwargs
     ):
         super().__init__(**kwargs)
         self.score_weight = score_weight
