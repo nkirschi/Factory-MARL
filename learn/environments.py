@@ -145,3 +145,14 @@ class SingleDeltaEnv(TaskEnv):
         norm_reward = np.exp(-np.linalg.norm(self._process_action(rl_action)))
         # TODO: take norm of [-1,1] action but ignore gripper dimension
         return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
+
+
+class SingleFullRLEnv(TaskEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _compose_control(self, rl_action):
+        _, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = self._process_action(rl_action)
+        action_arm1 = ik_action1
+        return action_arm0, action_arm1
