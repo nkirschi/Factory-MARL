@@ -99,6 +99,8 @@ class TaskEnv(BaseEnv):
             action_arm0=action_arm0, action_arm1=action_arm1
         )
 
+        # TODO terminate = ... dependent on info
+
         reward = self._get_reward(state, action, info)
         obs = self._process_observation(state)
         self.last_score = info["scores"].copy()
@@ -132,6 +134,7 @@ class SingleDeltaEnv(TaskEnv):
 
     def _compose_control(self, rl_action):
         action_arm0 = self.ik_policy0.act() + 0.5 * self._process_action(rl_action)
+        # TODO: debug output of act() and force-clip if necessary
         action_arm1 = self.ik_policy1.act()
         return action_arm0, action_arm1
 
@@ -139,4 +142,5 @@ class SingleDeltaEnv(TaskEnv):
         # Your custom reward function goes here
         score_reward = super()._get_reward(state, rl_action, info)
         norm_reward = np.exp(-np.linalg.norm(self._process_action(rl_action)))
+        # TODO: take norm of [-1,1] action but ignore gripper dimension
         return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
