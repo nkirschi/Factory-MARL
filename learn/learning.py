@@ -30,28 +30,28 @@ class AdditionalMetricsCallback(BaseCallback):
 
 
 if __name__ == "__main__":
-    os.environ["MUJOCO_GL"] = "osmesa"
     CONFIG = {
-        "num_envs": 4,
-        "env_class": SingleDeltaEnv,
-        "notes": "SAC with true score reward signal",  # adjust this before every run
-        "rl_algo": SAC,
-        "total_timesteps": int(1e6),
-        "log_interval": 5,  # for on-policy algos: #steps, for off-policy algos: #episodes
-        "chkpt_interval": int(1e6 / 10),
+        "num_envs": 1,
+        "env_class": SingleFullRLEnv,
+        "notes": "Full RL sanity check with PPO",  # adjust this before every run
+        "rl_algo": PPO,
+        "total_timesteps": int(1e7),
+        "log_interval": 10,  # for on-policy algos: #steps, for off-policy algos: #episodes
+        "chkpt_interval": int(1e7 / 10),
         "policy_type": "MlpPolicy",
-        "score_weight": 1,
-        "norm_penalty_weight": 0
+        #"score_weight": 0,
+        #"norm_penalty_weight": 0
     }
 
 
     def make_env():
-        env = CONFIG["env_class"](CONFIG["score_weight"],
-                                  CONFIG["norm_penalty_weight"],
+        env = CONFIG["env_class"](#CONFIG["score_weight"],
+                                  #CONFIG["norm_penalty_weight"],
                                   render_mode="rgb_array")
         return Monitor(env)
 
 
+    #os.environ["MUJOCO_GL"] = "osmesa"
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
     run = wandb.init(project="adlr",
                      notes=CONFIG["notes"],
@@ -67,10 +67,10 @@ if __name__ == "__main__":
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
     env.reset()
-    env = VecVideoRecorder(env,
-                           video_folder=f"videos/{run.id}",
-                           record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
-                           video_length=100)
+    # env = VecVideoRecorder(env,
+    #                        video_folder=f"videos/{run.id}",
+    #                        record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
+    #                        video_length=100)
     model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
