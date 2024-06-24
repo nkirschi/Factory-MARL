@@ -1,5 +1,5 @@
 # Example for a custom task definition
-
+import copy
 import numpy as np
 from typing import Any, Dict, Optional, Tuple
 from gymnasium import spaces
@@ -86,7 +86,6 @@ class TaskEnv(BaseEnv):
         return action_arm0, action_arm1
 
     def _get_reward(self, state, action, info) -> float:
-        # Your custom reward function goes here
         reward = sum(info["scores"]) - sum(self.last_score)
         return reward
 
@@ -156,3 +155,96 @@ class SingleFullRLEnv(TaskEnv):
         action_arm0 = self._process_action(rl_action)
         action_arm1 = ik_action1
         return action_arm0, action_arm1
+
+    def _get_reward(self, state, action, info) -> float:
+        # Your custom reward function goes here
+        return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(self._process_action(action)))
+
+
+class SingleDeltaEnvWithDistancePenalty(SingleDeltaEnv):
+    def __init__(
+        self,
+        render_mode: Optional[str] = None,
+        seed: Optional[int] = None,
+        width=1024,
+        height=1024
+    ):
+        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
+        self.old_min_dist_0 = 0
+        self.old_min_dist_1 = 0
+        self.old_min_bucket_dist_0 = 0
+        self.old_min_bucket_dist_1 = 0
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self.ik_policy0.act()
+        action_arm1 = self.ik_policy1.act() + 0.5 * self._process_action(rl_action)
+        return action_arm0, action_arm1
+
+    def _compute_min_distance(self, ik_policy, old_min_dist):
+        position = self.physics.named.data.site_xpos[ik_policy._gripper_site]
+
+        candidates = copy.copy(self.task_manager._in_scene)
+        if ik_policy.ignore_object is not None:
+            if ik_policy.ignore_object in candidates:
+                candidates.remove(ik_policy.ignore_object)
+
+        if len(candidates) == 0:
+            return None, old_min_dist, 0
+
+        pos = self.physics.bind(candidates).qpos.reshape(-1, 7)[:, :3]
+        dists = np.linalg.norm(
+            pos - position,
+            axis=1,
+            )
+
+        diff = old_min_dist - np.min(dists)
+
+        closest_object = candidates[np.argmin(dists)]
+        return closest_object, np.min(dists), diff
+
+    def _compute_bucket_distance_cube(self, min_object, bucket_pos, old_min_bucket_dist):
+        # position = self.physics.named.data.site_xpos[ik_policy._gripper_site]
+        if min_object is None:
+            return old_min_bucket_dist, 0
+
+        pos = self.physics.bind(min_object).qpos[:3]
+        dist = np.linalg.norm(pos - bucket_pos)
+        diff = old_min_bucket_dist - dist
+
+        return dist, diff
+
+    def _get_reward(self, state, action, info) -> float:
+        # Params
+        alpha_1 = .1  # Penalty weight for distance to target
+        alpha_2 = .2  # Penalty weight for distance to bucket
+        reward = sum(info["scores"]) - sum(self.last_score)
+        reward *= 10
+
+        old_min_dist = self.old_min_dist_0
+        min_object, min_dist, diff = self._compute_min_distance(self.ik_policy0, old_min_dist)
+        self.old_min_dist_0 = min_dist
+
+        old_min_dist = self.old_min_dist_1
+        min_object2, min_dist2, diff2 = self._compute_min_distance(self.ik_policy1, old_min_dist)
+        self.old_min_dist_1 = min_dist2
+
+        old_bucket_dist = self.old_min_bucket_dist_0
+        bucket_0_pos = [0.9, 0.7, 1.05]
+        bucket_dist, diff_bucket = self._compute_bucket_distance_cube(min_object, bucket_0_pos,
+                                                                      old_bucket_dist)
+        self.old_min_bucket_dist_0 = bucket_dist
+
+        old_bucket_dist = self.old_min_bucket_dist_1
+        bucket_1_pos = [-0.9, 0.7, 1.05]
+        bucket_dist2, diff_bucket2 = self._compute_bucket_distance_cube(min_object2, bucket_1_pos,
+                                                                        old_bucket_dist)
+        self.old_min_bucket_dist_1 = bucket_dist2
+
+        # print(f"dist: {min_dist}, bucket_dist: {bucket_dist}")
+        # print("diff:", diff, diff2, diff_bucket, diff_bucket2)
+
+        reward = reward + (alpha_1 * diff + alpha_2 * diff2)  # Add penalty for distance to target
+        reward = reward + (alpha_1 * diff_bucket + alpha_2 * diff_bucket2)  # Add penalty for distance to bucket
+        # print("reward:", reward)
+        return reward
+
