@@ -161,7 +161,7 @@ class SingleFullRLEnv(TaskEnv):
         return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(self._process_action(action)))
 
 
-class SingleDeltaEnvWithDistancePenalty(SingleDeltaEnv):
+class TaskEnvWithDistancePenalty(TaskEnv):
     def __init__(
         self,
         render_mode: Optional[str] = None,
@@ -176,8 +176,9 @@ class SingleDeltaEnvWithDistancePenalty(SingleDeltaEnv):
         self.old_min_bucket_dist_1 = 0
 
     def _compose_control(self, rl_action):
-        action_arm0 = self.ik_policy0.act()
-        action_arm1 = self.ik_policy1.act() + 0.5 * self._process_action(rl_action)
+        ik_action0, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
+        action_arm1 = ik_action1
         return action_arm0, action_arm1
 
     def _compute_min_distance(self, ik_policy, old_min_dist):

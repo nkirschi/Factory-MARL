@@ -1,7 +1,7 @@
 # example of using gymnasium.vector to create a vectorized environment
 # for parallelizing training of agents
 import gymnasium as gym
-from environments import TaskEnv, SingleDeltaEnvWithDistancePenalty
+from environments import TaskEnv, TaskEnvWithDistancePenalty
 import time
 
 
