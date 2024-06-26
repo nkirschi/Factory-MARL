@@ -164,12 +164,16 @@ class SingleFullRLEnv(TaskEnv):
 class TaskEnvWithDistancePenalty(TaskEnv):
     def __init__(
         self,
+        distance_gripper_penalty,
+        distance_bucket_penalty,
         render_mode: Optional[str] = None,
         seed: Optional[int] = None,
         width=1024,
         height=1024
     ):
         super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
+        self.distance_bucket_penalty = distance_bucket_penalty
+        self.distance_gripper_penalty = distance_gripper_penalty
         self.old_min_dist_0 = 0
         self.old_min_dist_1 = 0
         self.old_min_bucket_dist_0 = 0
@@ -216,10 +220,9 @@ class TaskEnvWithDistancePenalty(TaskEnv):
 
     def _get_reward(self, state, action, info) -> float:
         # Params
-        alpha_1 = .1  # Penalty weight for distance to target
-        alpha_2 = .2  # Penalty weight for distance to bucket
         reward = sum(info["scores"]) - sum(self.last_score)
-        reward *= 10
+        if reward > 0:
+            return reward
 
         old_min_dist = self.old_min_dist_0
         min_object, min_dist, diff = self._compute_min_distance(self.ik_policy0, old_min_dist)
@@ -252,8 +255,8 @@ class TaskEnvWithDistancePenalty(TaskEnv):
         # print(f"dist: {min_dist}, bucket_dist: {bucket_dist}")
         # print("diff:", diff, diff2, diff_bucket, diff_bucket2)
 
-        reward = reward + (alpha_1 * diff + alpha_2 * diff2)  # Add penalty for distance to target
-        reward = reward + (alpha_1 * diff_bucket + alpha_2 * diff_bucket2)  # Add penalty for distance to bucket
+        reward = reward + self.distance_gripper_penalty * (diff + diff2)  # Add penalty for distance to target
+        reward = reward + self.distance_bucket_penalty * (diff_bucket + diff_bucket2)  # Add penalty for dist to bucket
         # print("reward:", reward)
         return reward
 
