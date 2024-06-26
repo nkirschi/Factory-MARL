@@ -229,14 +229,22 @@ class TaskEnvWithDistancePenalty(TaskEnv):
         min_object2, min_dist2, diff2 = self._compute_min_distance(self.ik_policy1, old_min_dist)
         self.old_min_dist_1 = min_dist2
 
+        bucket_0_pos = None
+        bucket_1_pos = None
+
+        for (i, b) in enumerate(self.task_manager.buckets):
+            bucket_pos = self.physics.bind(b).xpos
+            if bucket_pos[0] > 0:
+                bucket_0_pos = bucket_pos
+            else:
+                bucket_1_pos = bucket_pos
+
         old_bucket_dist = self.old_min_bucket_dist_0
-        bucket_0_pos = [0.9, 0.7, 1.05]
         bucket_dist, diff_bucket = self._compute_bucket_distance_cube(min_object, bucket_0_pos,
                                                                       old_bucket_dist)
         self.old_min_bucket_dist_0 = bucket_dist
 
         old_bucket_dist = self.old_min_bucket_dist_1
-        bucket_1_pos = [-0.9, 0.7, 1.05]
         bucket_dist2, diff_bucket2 = self._compute_bucket_distance_cube(min_object2, bucket_1_pos,
                                                                         old_bucket_dist)
         self.old_min_bucket_dist_1 = bucket_dist2

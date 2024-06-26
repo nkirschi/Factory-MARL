@@ -6,7 +6,7 @@ import time
 
 
 def make_env_f():
-    return SingleDeltaEnvWithDistancePenalty(render_mode="human")
+    return TaskEnvWithDistancePenalty(render_mode="human")
 
 
 if __name__ == "__main__":
