@@ -6,7 +6,8 @@ import time
 
 
 def make_env_f():
-    return TaskEnvWithDistancePenalty(render_mode="human", distance_gripper_reward_factor=0.1, distance_bucket_reward_factor=0.2)
+    return TaskEnvWithDistancePenalty(render_mode="human", distance_gripper_reward_factor=0.1,
+                                      distance_bucket_reward_factor=0.2, base_reward=1)
 
 
 if __name__ == "__main__":
