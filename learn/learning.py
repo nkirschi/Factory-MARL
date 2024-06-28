@@ -34,9 +34,10 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
         super().__init__(**kwargs)
 
     def _on_step(self) -> bool:
-        result = super()._on_step()
-        wandb.save(f"{self.save_path}/*")
-        return result
+        alive = super()._on_step()
+        if self.n_calls % self.save_freq == 0:
+            wandb.save(f"{self.save_path}/*")
+        return alive
 
 
 if __name__ == "__main__":
