@@ -29,6 +29,16 @@ class AdditionalMetricsCallback(BaseCallback):
         return True
 
 
+class SyncifiedCheckpointCallback(CheckpointCallback):
+    def __int__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _on_step(self) -> bool:
+        result = super()._on_step()
+        wandb.save(f"{self.save_path}/*")
+        return result
+
+
 if __name__ == "__main__":
     CONFIG = {
         "num_envs": 8,
@@ -39,19 +49,19 @@ if __name__ == "__main__":
         "log_interval": 10,  # for on-policy algos: #steps, for off-policy algos: #episodes
         "chkpt_interval": int(1e7 / 10),
         "policy_type": "MlpPolicy",
-        #"score_weight": 0,
-        #"norm_penalty_weight": 0
+        # "score_weight": 0,
+        # "norm_penalty_weight": 0
     }
 
 
     def make_env():
-        env = CONFIG["env_class"](#CONFIG["score_weight"],
-                                  #CONFIG["norm_penalty_weight"],
-                                  render_mode="rgb_array")
+        env = CONFIG["env_class"](  # CONFIG["score_weight"],
+            # CONFIG["norm_penalty_weight"],
+            render_mode="rgb_array")
         return Monitor(env)
 
 
-    #os.environ["MUJOCO_GL"] = "osmesa"
+    # os.environ["MUJOCO_GL"] = "osmesa"
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
     run = wandb.init(project="adlr",
                      notes=CONFIG["notes"],
@@ -59,10 +69,6 @@ if __name__ == "__main__":
                      sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
-    os.makedirs(f"policies_sb3/{run.id}", exist_ok=False)
-    wandb.save(f"policies_sb3/{run.id}/*")
-    os.makedirs(f"policies_wandb/{run.id}", exist_ok=False)
-    wandb.save(f"policies_wandb/{run.id}/*")
     env = make_vec_env(make_env,
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
@@ -75,10 +81,10 @@ if __name__ == "__main__":
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
                 callback=[  # ProgressBarCallback(),
-                    CheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                       save_path=f"policies_sb3/{run.id}"),
+                    SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
+                                                save_path=f"{run.path}/checkpoints"),
                     WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                  model_save_path=f"policies_wandb/{run.id}",
+                                  model_save_path=run.path,
                                   verbose=2),
                     AdditionalMetricsCallback()])
 
