@@ -78,14 +78,14 @@ if __name__ == "__main__":
     #                        video_folder=f"videos/{run.id}",
     #                        record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
     #                        video_length=100)
-    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}")
+    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"{run.dir}/tensorboard")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
                 callback=[  # ProgressBarCallback(),
                     SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                                save_path=f"{run.path}/checkpoints"),
+                                                save_path=f"{run.dir}/checkpoints"),
                     WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                  model_save_path=run.path,
+                                  model_save_path=run.dir,
                                   verbose=2),
                     AdditionalMetricsCallback()])
 
