@@ -63,7 +63,7 @@ class IKPolicy:
 
         self.pre_release_pos = np.array([self._bucket_pos[0], self._bucket_pos[1], 1.3])
 
-        self.default_pose = np.array([-0.5, -0.5, 0.0, 1.0, 0.0, -1.6, 0.0, 2.0])
+        self.default_pose = np.array([-0.5, -0.5, 0.0, 1.0, 0.0, -1.6, 0.0, 0.06])
         self.default_gripper_quat = np.array([0, 0, 1, 0])
 
         self.cube_sym = R.create_group("O")
