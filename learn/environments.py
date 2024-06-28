@@ -79,9 +79,9 @@ class TaskEnv(BaseEnv):
 
     def _compose_control(self, rl_action):
         # Override this in a subclass
-        action_arm0 = self.ik_policy0.act()
+        action_arm0 = self.ik_policy0.act().clip(self.model.actuator_ctrlrange[1:9, 0], self.model.actuator_ctrlrange[1:9, 1])
         self.ik_policy1.ignore(self.ik_policy0.target_object)
-        action_arm1 = self.ik_policy1.act()
+        action_arm1 = self.ik_policy1.act().clip(self.model.actuator_ctrlrange[9:17, 0], self.model.actuator_ctrlrange[9:17, 1])
         self.ik_policy0.ignore(self.ik_policy1.target_object)
         return action_arm0, action_arm1
 
@@ -135,7 +135,6 @@ class SingleDeltaEnv(TaskEnv):
     def _compose_control(self, rl_action):
         ik_action0, ik_action1 = super()._compose_control(rl_action)
         action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
-        # TODO: debug output of act() and force-clip if necessary
         action_arm1 = ik_action1
         return action_arm0, action_arm1
 
@@ -144,6 +143,30 @@ class SingleDeltaEnv(TaskEnv):
         score_reward = super()._get_reward(state, rl_action, info)
         norm_reward = np.exp(-np.linalg.norm(self._process_action(rl_action)))
         # TODO: take norm of [-1,1] action but ignore gripper dimension
+        return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
+
+
+class DoubleDeltaEnv(TaskEnv):
+    def __init__(
+            self,
+            score_weight,
+            norm_penalty_weight,
+            **kwargs
+    ):
+        super().__init__(**kwargs)
+        self.score_weight = score_weight
+        self.norm_penalty_weight = norm_penalty_weight
+
+    def _compose_control(self, rl_action):
+        ik_action0, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
+        action_arm1 = ik_action1
+        return action_arm0, action_arm1
+
+    def _get_reward(self, state, rl_action, info) -> float:
+        # Your custom reward function goes here
+        score_reward = super()._get_reward(state, rl_action, info)
+        norm_reward = np.exp(-np.linalg.norm(self._process_action(rl_action)))
         return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
 
 
