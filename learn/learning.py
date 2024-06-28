@@ -31,7 +31,7 @@ class AdditionalMetricsCallback(BaseCallback):
 
 if __name__ == "__main__":
     CONFIG = {
-        "num_envs": 1,
+        "num_envs": 8,
         "env_class": SingleFullRLEnv,
         "notes": "Full RL sanity check with PPO",  # adjust this before every run
         "rl_algo": PPO,
