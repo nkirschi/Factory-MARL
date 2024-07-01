@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Tuple
 from gymnasium import spaces
 
 from challenge_env.base_env import BaseEnv
-from challenge_env.ik_policy import IKPolicy
+from challenge_env.ik_policy import IKPolicy, PolicyState
 
 
 class TaskEnv(BaseEnv):
@@ -88,7 +88,6 @@ class TaskEnv(BaseEnv):
         :param rl_action: The action provided by the reinforcement learning algorithm.
         :return: The composed control action.
         """
-        print("TaskEnv called")
 
         # Override this in a subclass
         action_arm0 = self.ik_policy0.act().clip(self.model.actuator_ctrlrange[1:9, 0],
@@ -281,7 +280,9 @@ class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
 
     def _compose_control(self, rl_action):
         ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
+        action_arm0 = ik_action0
+        if self.ik_policy0.state is not PolicyState.IDLE:
+            action_arm0 += 0.25 * self._process_action(rl_action)
         action_arm1 = ik_action1
         return action_arm0, action_arm1
 
@@ -298,6 +299,11 @@ class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
 
     def _compose_control(self, rl_action):
         ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action[0:8])
-        action_arm1 = ik_action1 + 0.5 * self._process_action(rl_action[8:16])
+        action_arm0 = ik_action0
+        if self.ik_policy0.state is not PolicyState.IDLE:
+            action_arm0 += 0.25 * self._process_action(rl_action[0:8])
+        action_arm1 = ik_action1
+        if self.ik_policy1.state is not PolicyState.IDLE:
+            action_arm1 += 0.25 * self._process_action(rl_action[8:16])
+
         return action_arm0, action_arm1
