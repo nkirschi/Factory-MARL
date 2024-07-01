@@ -170,30 +170,6 @@ class SingleDeltaEnv(TaskEnv):
         return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
 
 
-class DoubleDeltaEnv(TaskEnv):
-    def __init__(
-            self,
-            score_weight,
-            norm_penalty_weight,
-            **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.score_weight = score_weight
-        self.norm_penalty_weight = norm_penalty_weight
-
-    def _compose_control(self, rl_action):
-        ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
-        action_arm1 = ik_action1
-        return action_arm0, action_arm1
-
-    def _get_reward(self, state, rl_action, info) -> float:
-        # Your custom reward function goes here
-        score_reward = super()._get_reward(state, rl_action, info)
-        norm_reward = np.exp(-np.linalg.norm(self._process_action(rl_action)))
-        return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
-
-
 class SingleFullRLEnv(TaskEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -209,7 +185,7 @@ class SingleFullRLEnv(TaskEnv):
         return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(self._process_action(action)))
 
 
-class TaskEnvWithDistancePenalty(TaskEnv):
+class SingleDeltaProgressRewardEnv(TaskEnv):
     """
     This class extends the TaskEnv class and adds a distance penalty to the reward function.
     The distance penalty is calculated based on the distance between the gripper and the cube, and the distance between

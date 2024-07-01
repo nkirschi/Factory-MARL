@@ -3,7 +3,7 @@ from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, ProgressBarCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
+from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecVideoRecorder
 from environments import *
 from wandb.integration.sb3 import WandbCallback
 
@@ -43,24 +43,19 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
 if __name__ == "__main__":
     CONFIG = {
         "num_envs": 8,
-        "env_class": SingleFullRLEnv,
-        "notes": "Full RL sanity check with PPO",  # adjust this before every run
+        "env_class": SingleDeltaProgressRewardEnv,
+        "env_kwargs": {
+            "gripper_to_closest_cube_reward_factor": 0.1,
+            "closest_cube_to_bucket_reward_factor": 0.1,
+            "base_reward": 0.1
+        },
+        "notes": "Progress reward test run with PPO",  # adjust this before every run
         "rl_algo": PPO,
-        "total_timesteps": int(1e7),
-        "log_interval": 10,  # for on-policy algos: #steps, for off-policy algos: #episodes
-        "chkpt_interval": int(1e7 / 10),
+        "total_timesteps": int(1e5),
+        "log_interval": 1,  # for on-policy algos: #steps, for off-policy algos: #episodes
+        "chkpt_interval": int(1e5 / 10),
         "policy_type": "MlpPolicy",
-        # "score_weight": 0,
-        # "norm_penalty_weight": 0
     }
-
-
-    def make_env():
-        env = CONFIG["env_class"](  # CONFIG["score_weight"],
-            # CONFIG["norm_penalty_weight"],
-            render_mode="rgb_array")
-        return Monitor(env)
-
 
     # os.environ["MUJOCO_GL"] = "osmesa"
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
@@ -70,9 +65,9 @@ if __name__ == "__main__":
                      sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
-    env = make_vec_env(make_env,
+    env = make_vec_env(lambda: Monitor(CONFIG["env_class"](render_mode="rgb_array", **CONFIG["env_kwargs"])),
                        n_envs=CONFIG["num_envs"],
-                       vec_env_cls=SubprocVecEnv)
+                       vec_env_cls=DummyVecEnv)
     env.reset()
     # env = VecVideoRecorder(env,
     #                        video_folder=f"videos/{run.id}",
