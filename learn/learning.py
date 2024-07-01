@@ -57,6 +57,12 @@ if __name__ == "__main__":
         "policy_type": "MlpPolicy",
     }
 
+
+    def make_env():
+        env = CONFIG["env_class"](render_mode="rgb_array", **CONFIG["env_kwargs"])
+        return Monitor(env)
+
+
     # os.environ["MUJOCO_GL"] = "osmesa"
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
     run = wandb.init(project="adlr",
@@ -65,7 +71,7 @@ if __name__ == "__main__":
                      sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
-    env = make_vec_env(lambda: Monitor(CONFIG["env_class"](render_mode="rgb_array", **CONFIG["env_kwargs"])),
+    env = make_vec_env(make_env,
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=DummyVecEnv)
     env.reset()
