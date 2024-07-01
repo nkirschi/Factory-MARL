@@ -1,16 +1,17 @@
 # example of using gymnasium.vector to create a vectorized environment
 # for parallelizing training of agents
 import gymnasium as gym
-from task_env import TaskEnv
+from environments import TaskEnv, TaskEnvWithDistancePenalty
 import time
 
 
 def make_env_f():
-    return TaskEnv(render_mode="rgb_array")
+    return TaskEnvWithDistancePenalty(render_mode="human", distance_gripper_reward_factor=0.1,
+                                      distance_bucket_reward_factor=0.2, base_reward=1)
 
 
 if __name__ == "__main__":
-    num_envs = 8  # number of parallel environments
+    num_envs = 1  # number of parallel environments
     env = gym.vector.AsyncVectorEnv(
         [
             *[make_env_f for _ in range(num_envs)],
