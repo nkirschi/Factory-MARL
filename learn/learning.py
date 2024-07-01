@@ -79,7 +79,7 @@ if __name__ == "__main__":
                 callback=[  # ProgressBarCallback(),
                     SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                                 save_path=f"{run.dir}/checkpoints"),
-                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"], verbose=2),
+                    WandbCallback(verbose=2),
                     AdditionalMetricsCallback()])
 
     run.finish()
