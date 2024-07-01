@@ -71,7 +71,8 @@ class TaskEnv(BaseEnv):
         """
         # A common choice is to let the policy output actions in the range [-1, 1]
         # and scale them to the desired range here
-        action = np.clip(action, -1.0, 1.0)
+        #action = np.clip(action, -1.0, 1.0)  # TODO try tanh instead
+        action = np.tanh(action)
         bounds = self.joint_limits.copy()  # joint_limits is a property of BaseEnv
         low, high = bounds.T
         ctrl = low + (action + 1.0) * 0.5 * (high - low)
@@ -219,7 +220,8 @@ class SingleDeltaProgressRewardEnv(TaskEnv):
         see superclass
         """
         ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
+        #action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
+        action_arm0 = self._process_action(rl_action)
         action_arm1 = ik_action1
         return action_arm0, action_arm1
 
