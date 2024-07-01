@@ -78,14 +78,39 @@ class TaskEnv(BaseEnv):
         return ctrl
 
     def _compose_control(self, rl_action):
+        """
+        Compose the control action for the environment.
+
+        :param rl_action: The action provided by the reinforcement learning algorithm.
+        :return: The composed control action.
+        """
+
         # Override this in a subclass
-        action_arm0 = self.ik_policy0.act().clip(self.model.actuator_ctrlrange[1:9, 0], self.model.actuator_ctrlrange[1:9, 1])
+        action_arm0 = self.ik_policy0.act().clip(self.model.actuator_ctrlrange[1:9, 0],
+                                                 self.model.actuator_ctrlrange[1:9, 1])
         self.ik_policy1.ignore(self.ik_policy0.target_object)
-        action_arm1 = self.ik_policy1.act().clip(self.model.actuator_ctrlrange[9:17, 0], self.model.actuator_ctrlrange[9:17, 1])
+        action_arm1 = self.ik_policy1.act().clip(self.model.actuator_ctrlrange[9:17, 0],
+                                                 self.model.actuator_ctrlrange[9:17, 1])
         self.ik_policy0.ignore(self.ik_policy1.target_object)
         return action_arm0, action_arm1
 
     def _get_reward(self, state, action, info) -> float:
+        """
+        Compute the reward for the current state of the environment.
+
+        This method overrides the `_get_reward` method from the parent class `TaskEnv`.
+        The reward is computed based on the base reward, the distance between the gripper and the cube,
+        and the distance between the cube and the bucket.
+
+        Parameters:
+        state (np.ndarray): The current state of the environment.
+        action (np.ndarray): The action taken in the current state.
+        info (dict): Additional information about the current state.
+
+        Returns:
+        float: The computed reward.
+        """
+
         reward = sum(info["scores"]) - sum(self.last_score)
         return reward
 
@@ -196,141 +221,105 @@ class TaskEnvWithDistancePenalty(TaskEnv):
 
     def __init__(
             self,
-            distance_gripper_reward_factor,
-            distance_bucket_reward_factor,
+            gripper_to_closest_cube_reward_factor,
+            closest_cube_to_bucket_reward_factor,
             base_reward=0.0,
-            render_mode: Optional[str] = None,
-            seed: Optional[int] = None,
-            width=1024,
-            height=1024
+            **kwargs
     ):
         """
-        Initialize the environment with the given parameters.
-
-        :param distance_gripper_reward_factor: The reward factor for the distance between the gripper and the cube.
-        :param distance_bucket_reward_factor: The reward factor for the distance between the cube and the bucket.
-        :param base_reward: The base reward for the environment, it gets added to the reward to avoid large negative
-        rewards.
-        :param render_mode: The mode to render the environment.
-        :param seed: The seed for the random number generator.
-        :param width: The width of the environment.
-        :param height: The height of the environment.
+        :param gripper_to_closest_cube_reward_factor: Weight for the gripper-to-closest-cube distance.
+        :param closest_cube_to_bucket_reward_factor: Weight for the closest-cube-to-bucket distance.
+        :param base_reward: A base reward to avoid large negative rewards.
         """
-        super().__init__(render_mode=render_mode, seed=seed, width=width, height=height)
-        self.distance_bucket_reward_factor = distance_bucket_reward_factor
-        self.distance_gripper_reward_factor = distance_gripper_reward_factor
-        self.old_min_dist_grabber_cube = [0] * self.NUM_AGENTS
-        self.old_min_dist_cube_bucket = [0] * self.NUM_AGENTS
+        super().__init__(**kwargs)
+        self.gripper_to_closest_cube_reward_factor = gripper_to_closest_cube_reward_factor
+        self.closest_cube_to_bucket_reward_factor = closest_cube_to_bucket_reward_factor
+        self.last_gripper_to_closest_cube_dist = [0] * self.NUM_AGENTS
+        self.last_bucket_to_closest_cube_dist = [0] * self.NUM_AGENTS
         self.base_reward = base_reward
 
     def _compose_control(self, rl_action):
         """
-        Compose the control action for the environment.
-
-        :param rl_action: The action provided by the reinforcement learning algorithm.
-        :return: The composed control action.
+        see superclass
         """
         ik_action0, ik_action1 = super()._compose_control(rl_action)
         action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
         action_arm1 = ik_action1
         return action_arm0, action_arm1
 
-    def _compute_cube_grabber_distance(self, ik_policy, old_min_dist_grabber_cube):
+    def _compute_gripper_to_closest_cube_dist(self, ik_policy, last_dist_gripper_to_closest_cube):
         """
-        Compute the distance between the cube and the grabber.
+        Compute the distance between the given gripper and the closest cube on the scene that it is not ignoring.
 
-        :param ik_policy: The inverse kinematics policy.
-        :param old_min_dist_grabber_cube: The old minimum distance between the grabber and the cube.
+        :param ik_policy: The inverse kinematics policy of the gripper to calculate the distance for.
+        :param last_dist_gripper_to_closest_cube: The previous distance between the gripper and the closest cube.
 
-        :return: The closest cube, the minimum distance, and the change in distance.
+        :return: The closest cube, its distance to the gripper, and the change in distance to the previous step.
         """
-        position = self.physics.named.data.site_xpos[ik_policy._gripper_site]
+        gripper_pos = self.physics.named.data.site_xpos[ik_policy._gripper_site]
 
         candidates = copy.copy(self.task_manager._in_scene)
-        if ik_policy.ignore_object is not None:
-            if ik_policy.ignore_object in candidates:
-                candidates.remove(ik_policy.ignore_object)
+        if ik_policy.ignore_object is not None and ik_policy.ignore_object in candidates:
+            candidates.remove(ik_policy.ignore_object)
 
         if len(candidates) == 0:
-            return None, old_min_dist_grabber_cube, 0
+            return None, last_dist_gripper_to_closest_cube, 0
 
-        pos = self.physics.bind(candidates).qpos.reshape(-1, 7)[:, :3]
-        dists = np.linalg.norm(
-            pos - position,
-            axis=1,
-        )
+        cand_pos = self.physics.bind(candidates).qpos.reshape(-1, 7)[:, :3]
+        dists = np.linalg.norm(cand_pos - gripper_pos, axis=1)
+        min_index = np.argmin(dists)
 
-        dist_to_cube_change = old_min_dist_grabber_cube - np.min(dists)
+        return candidates[min_index], dists[min_index], last_dist_gripper_to_closest_cube - dists[min_index]
 
-        closest_object = candidates[np.argmin(dists)]
-        return closest_object, np.min(dists), dist_to_cube_change
-
-    def _compute_bucket_cube_distance(self, closest_cube, bucket_pos, old_min_bucket_dist):
+    def _compute_bucket_to_closest_cube_dist(self, closest_cube, bucket_pos, last_dist_bucket_cube):
         """
-        Compute the distance between the cube and the bucket.
+        Compute the distance between the given cube and the closest bucket.
 
-        :param closest_cube: The cube that is closest to the grabber.
+        :param closest_cube: The cube that is closest to the gripper.
         :param bucket_pos: The position of the bucket.
-        :param old_min_bucket_dist: The old minimum distance between the bucket and the cube.
-        :return: The distance to the bucket and the change in distance.
+        :param last_dist_bucket_cube: The previous distance between the bucket and the cube.
+        :return: The distance to the bucket and the change in distance to the previous step.
         """
         if closest_cube is None:
-            return old_min_bucket_dist, 0
-        cube_position = self.physics.bind(closest_cube).qpos[:3]
-        dist_cube_bucket = np.linalg.norm(cube_position - bucket_pos)
-        dist_bucket_change = old_min_bucket_dist - dist_cube_bucket
+            return last_dist_bucket_cube, 0
 
-        return dist_cube_bucket, dist_bucket_change
+        cube_pos = self.physics.bind(closest_cube).qpos[:3]
+        dist_bucket_cube = np.linalg.norm(cube_pos - bucket_pos)
+
+        return dist_bucket_cube, last_dist_bucket_cube - dist_bucket_cube
 
     def _get_reward(self, state, action, info) -> float:
         """
-        Compute the reward for the current state of the environment.
-
-        This method overrides the `_get_reward` method from the parent class `TaskEnv`.
-        The reward is computed based on the base reward, the distance between the gripper and the cube,
-        and the distance between the cube and the bucket.
-
-        Parameters:
-        state (np.ndarray): The current state of the environment.
-        action (np.ndarray): The action taken in the current state.
-        info (dict): Additional information about the current state.
-
-        Returns:
-        float: The computed reward.
+        see superclass
         """
-        reward = super()._get_reward(state, action, info)
-        # Check if the agent scored a point, if so, the distance to the cube and bucket calculated to get a difference
-        # in the next round, but the score change is then return.
-        # Otherwise, the much larger distance to the now next closest cube is adding so much penalty, that the reward
-        # will be low or negative.
-        scored = reward > 0
-
-        new_reward = reward + self.base_reward
-
-        policies = [self.ik_policy0, self.ik_policy1]
 
         # Compute the closest cube for each agent and the distance to the cube
+        gripper_cube_reward = 0.0
+        policies = [self.ik_policy0, self.ik_policy1]
         closest_cubes = []
         for i, policy in enumerate(policies):
-            closest_cube, dist_closest_cube, dist_closest_cube_change \
-                = self._compute_cube_grabber_distance(policy, self.old_min_dist_grabber_cube[i])
-            self.old_min_dist_grabber_cube[i] = dist_closest_cube
+            closest_cube, dist_closest_cube, dist_closest_cube_change = self._compute_gripper_to_closest_cube_dist(
+                policy, self.last_gripper_to_closest_cube_dist[i]
+            )
             closest_cubes.append(closest_cube)
-            self.old_min_dist_grabber_cube[i] = dist_closest_cube
-            new_reward = new_reward + self.distance_gripper_reward_factor * dist_closest_cube_change
+            self.last_gripper_to_closest_cube_dist[i] = dist_closest_cube
+            gripper_cube_reward += dist_closest_cube_change
 
-        # Reads the bucket positions
-        bucket_positions = [None] * self.NUM_AGENTS
-        for (i, b) in enumerate(self.task_manager.buckets):
-            bucket_pos = self.physics.bind(b).xpos
-            bucket_positions[i] = bucket_pos
+        # Compute the distance between the cube and the own bucket for each agent
+        bucket_cube_reward = 0.0
+        bucket_positions = [self.physics.bind(b).xpos for b in self.task_manager.buckets]
+        for i, _ in enumerate(closest_cubes):
+            dist_bucket, dist_bucket_change = self._compute_bucket_to_closest_cube_dist(
+                closest_cubes[i], bucket_positions[i], self.last_bucket_to_closest_cube_dist[i]
+            )
+            self.last_bucket_to_closest_cube_dist[i] = dist_bucket
+            bucket_cube_reward += dist_bucket_change
 
-        # Compute the distance between the cube and the bucket
-        for i, closest_cube in enumerate(closest_cubes):
-            bucket_pos = bucket_positions[i]
-            dist_to_bucket, dist_to_bucket_change = self._compute_bucket_cube_distance(closest_cube, bucket_pos,
-                                                                                       self.old_min_dist_cube_bucket[i])
-            self.old_min_dist_cube_bucket[i] = dist_to_bucket
-            new_reward = new_reward + self.distance_bucket_reward_factor * dist_to_bucket_change
+        score_reward = super()._get_reward(state, action, info)
+        progress_reward = self.base_reward \
+                          + self.gripper_to_closest_cube_reward_factor * gripper_cube_reward \
+                          + self.closest_cube_to_bucket_reward_factor * bucket_cube_reward
 
-        return reward if scored else new_reward
+        # If some agent scored a point, the score change is returned instead of the progress reward to avoid an
+        # unwanted penalty due to the suddenly increased distance to the new closest cube
+        return score_reward if score_reward > 0 else progress_reward
