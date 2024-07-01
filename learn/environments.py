@@ -1,4 +1,3 @@
-# Example for a custom task definition
 import copy
 import numpy as np
 from typing import Any, Dict, Optional, Tuple
@@ -27,15 +26,18 @@ class TaskEnv(BaseEnv):
         self.ik_policy1 = IKPolicy(self, arm_id=1)
 
         # Example custom observation and action spaces:
-        obs_dims = 2 * self.dof + 13 * self.max_num_objects
+        obs_dims = 6 * self.dof + 13 * self.max_num_objects
         self.observation_space = spaces.Box(
             low=-np.inf * np.ones(obs_dims),
             high=np.inf * np.ones(obs_dims),
             dtype=np.float32,
         )
 
+        action_dims = self.dof
         self.action_space = spaces.Box(
-            low=-np.ones(self.dof), high=np.ones(self.dof), dtype=np.float32
+            low=-np.ones(action_dims),
+            high=np.ones(action_dims),
+            dtype=np.float32
         )
 
     def _process_observation(self, state: np.ndarray) -> np.ndarray:
@@ -47,18 +49,19 @@ class TaskEnv(BaseEnv):
         Output:
             obs: Your custom feature representation as expected by your agent
         """
-        # Example:
-        dof_measurements = np.concatenate(
-            [
-                state["qpos_player1"].flatten(),
-                state["qvel_player1"].flatten(),
-            ]
-        )
-
-        object_states = np.concatenate(
-            [state["object_poses"].flatten(), state["object_vels"].flatten()]
-        )
-        obs = np.concatenate([dof_measurements, object_states])
+        joint_states = np.concatenate([
+            state["qpos_player0"].flatten(),
+            state["qvel_player0"].flatten(),
+            state["ctrl_player0"].flatten(),
+            state["qpos_player1"].flatten(),
+            state["qvel_player1"].flatten(),
+            state["ctrl_player1"].flatten(),
+        ])
+        object_states = np.concatenate([
+            state["object_poses"].flatten(),
+            state["object_vels"].flatten()
+        ])
+        obs = np.concatenate([joint_states, object_states])
         return obs
 
     def _process_action(self, action: np.ndarray) -> np.ndarray:
@@ -71,7 +74,7 @@ class TaskEnv(BaseEnv):
         """
         # A common choice is to let the policy output actions in the range [-1, 1]
         # and scale them to the desired range here
-        #action = np.clip(action, -1.0, 1.0)  # TODO try tanh instead
+        # action = np.clip(action, -1.0, 1.0)
         action = np.tanh(action)
         bounds = self.joint_limits.copy()  # joint_limits is a property of BaseEnv
         low, high = bounds.T
@@ -85,6 +88,7 @@ class TaskEnv(BaseEnv):
         :param rl_action: The action provided by the reinforcement learning algorithm.
         :return: The composed control action.
         """
+        print("TaskEnv called")
 
         # Override this in a subclass
         action_arm0 = self.ik_policy0.act().clip(self.model.actuator_ctrlrange[1:9, 0],
@@ -146,47 +150,7 @@ class TaskEnv(BaseEnv):
         return obs, {}
 
 
-class SingleDeltaEnv(TaskEnv):
-    def __init__(
-            self,
-            score_weight,
-            norm_penalty_weight,
-            **kwargs
-    ):
-        super().__init__(**kwargs)
-        self.score_weight = score_weight
-        self.norm_penalty_weight = norm_penalty_weight
-
-    def _compose_control(self, rl_action):
-        ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
-        action_arm1 = ik_action1
-        return action_arm0, action_arm1
-
-    def _get_reward(self, state, rl_action, info) -> float:
-        # Your custom reward function goes here
-        score_reward = super()._get_reward(state, rl_action, info)
-        norm_reward = np.exp(-np.linalg.norm(self._process_action(rl_action)))
-        # TODO: take norm of [-1,1] action but ignore gripper dimension
-        return self.score_weight * score_reward + self.norm_penalty_weight * norm_reward
-
-
-class SingleFullRLEnv(TaskEnv):
-    def __init__(self, **kwargs):
-        super().__init__(**kwargs)
-
-    def _compose_control(self, rl_action):
-        _, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = self._process_action(rl_action)
-        action_arm1 = ik_action1
-        return action_arm0, action_arm1
-
-    def _get_reward(self, state, action, info) -> float:
-        # Your custom reward function goes here
-        return super()._get_reward(state, action, info) + 0.1 * np.exp(-np.linalg.norm(self._process_action(action)))
-
-
-class SingleDeltaProgressRewardEnv(TaskEnv):
+class ProgressRewardEnv(TaskEnv):
     """
     This class extends the TaskEnv class and adds a distance penalty to the reward function.
     The distance penalty is calculated based on the distance between the gripper and the cube, and the distance between
@@ -200,6 +164,7 @@ class SingleDeltaProgressRewardEnv(TaskEnv):
             self,
             gripper_to_closest_cube_reward_factor,
             closest_cube_to_bucket_reward_factor,
+            small_action_norm_reward_factor,
             base_reward=0.0,
             **kwargs
     ):
@@ -211,19 +176,10 @@ class SingleDeltaProgressRewardEnv(TaskEnv):
         super().__init__(**kwargs)
         self.gripper_to_closest_cube_reward_factor = gripper_to_closest_cube_reward_factor
         self.closest_cube_to_bucket_reward_factor = closest_cube_to_bucket_reward_factor
+        self.small_action_norm_reward_factor = small_action_norm_reward_factor
         self.last_gripper_to_closest_cube_dist = [0] * self.NUM_AGENTS
         self.last_bucket_to_closest_cube_dist = [0] * self.NUM_AGENTS
         self.base_reward = base_reward
-
-    def _compose_control(self, rl_action):
-        """
-        see superclass
-        """
-        ik_action0, ik_action1 = super()._compose_control(rl_action)
-        #action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
-        action_arm0 = self._process_action(rl_action)
-        action_arm1 = ik_action1
-        return action_arm0, action_arm1
 
     def _compute_gripper_to_closest_cube_dist(self, ik_policy, last_dist_gripper_to_closest_cube):
         """
@@ -293,11 +249,55 @@ class SingleDeltaProgressRewardEnv(TaskEnv):
             self.last_bucket_to_closest_cube_dist[i] = dist_bucket
             bucket_cube_reward += dist_bucket_change
 
+        # Compute a decreasing positive function of the action norm, ignoring the gripper dims
+        non_gripper_actions = action[[i for i in range(self.action_space.shape[0]) if i % 8 != 7]]
+        action_norm_reward = np.exp(-np.linalg.norm(non_gripper_actions))
+
         score_reward = super()._get_reward(state, action, info)
         progress_reward = self.base_reward \
                           + self.gripper_to_closest_cube_reward_factor * gripper_cube_reward \
-                          + self.closest_cube_to_bucket_reward_factor * bucket_cube_reward
+                          + self.closest_cube_to_bucket_reward_factor * bucket_cube_reward \
+                          + self.small_action_norm_reward_factor * action_norm_reward
 
         # If some agent scored a point, the score change is returned instead of the progress reward to avoid an
         # unwanted penalty due to the suddenly increased distance to the new closest cube
         return score_reward if score_reward > 0 else progress_reward
+
+
+class SingleFullRLProgressRewardEnv(ProgressRewardEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _compose_control(self, rl_action):
+        _, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = self._process_action(rl_action)
+        action_arm1 = ik_action1
+        return action_arm0, action_arm1
+
+
+class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _compose_control(self, rl_action):
+        ik_action0, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action)
+        action_arm1 = ik_action1
+        return action_arm0, action_arm1
+
+
+class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        action_dims = 2 * self.dof
+        self.action_space = spaces.Box(
+            low=-np.ones(action_dims),
+            high=np.ones(action_dims),
+            dtype=np.float32
+        )
+
+    def _compose_control(self, rl_action):
+        ik_action0, ik_action1 = super()._compose_control(rl_action)
+        action_arm0 = ik_action0 + 0.5 * self._process_action(rl_action[0:8])
+        action_arm1 = ik_action1 + 0.5 * self._process_action(rl_action[8:16])
+        return action_arm0, action_arm1
