@@ -35,8 +35,8 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
 
     def _on_step(self) -> bool:
         alive = super()._on_step()
-        #if self.n_calls % self.save_freq == 0:
-        #    wandb.save(f"{self.save_path}/*", policy="now")
+        if self.n_calls % self.save_freq == 0:
+            wandb.save(f"{self.save_path}/*", policy="now", base_path="/".join(self.save_path.split("/")[:-1]))
         return alive
 
 
@@ -70,16 +70,18 @@ if __name__ == "__main__":
                        vec_env_cls=DummyVecEnv)
     env.reset()
     # env = VecVideoRecorder(env,
-    #                        video_folder=f"videos/{run.id}",
+    #                        video_folder=f"runs/{run.id}/videos",
     #                        record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
     #                        video_length=100)
-    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"{run.dir}/tensorboard")
+    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}/tensorboard")
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
                 callback=[  # ProgressBarCallback(),
                     SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                                save_path=f"{run.dir}/checkpoints"),
-                    WandbCallback(verbose=2),
+                                                save_path=f"runs/{run.id}/checkpoints"),
+                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
+                                  model_save_path=f"runs/{run.id}/checkpoints",
+                                  verbose=2),
                     AdditionalMetricsCallback()])
 
     run.finish()
