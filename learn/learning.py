@@ -36,7 +36,7 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
     def _on_step(self) -> bool:
         alive = super()._on_step()
         if self.n_calls % self.save_freq == 0:
-            wandb.save(f"{self.save_path}/*")
+            wandb.save(f"{self.save_path}/*", policy="now")
         return alive
 
 
@@ -84,9 +84,7 @@ if __name__ == "__main__":
                 callback=[  # ProgressBarCallback(),
                     SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                                 save_path=f"{run.dir}/checkpoints"),
-                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                  model_save_path=run.dir,
-                                  verbose=2),
+                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"], verbose=2),
                     AdditionalMetricsCallback()])
 
     run.finish()
