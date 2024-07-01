@@ -73,7 +73,7 @@ if __name__ == "__main__":
                      save_code=True)
     env = make_vec_env(make_env,
                        n_envs=CONFIG["num_envs"],
-                       vec_env_cls=DummyVecEnv)
+                       vec_env_cls=SubprocVecEnv)
     env.reset()
     # env = VecVideoRecorder(env,
     #                        video_folder=f"runs/{run.id}/videos",
