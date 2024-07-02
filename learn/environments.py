@@ -254,8 +254,8 @@ class ProgressRewardEnv(TaskEnv):
 
         score_reward = super()._get_reward(state, action, info)
         progress_reward = self.base_reward \
-                          + self.gripper_to_closest_cube_reward_factor * gripper_cube_reward \
-                          + self.closest_cube_to_bucket_reward_factor * bucket_cube_reward \
+                          + self.gripper_to_closest_cube_reward_factor * max(0.0, gripper_cube_reward) \
+                          + self.closest_cube_to_bucket_reward_factor * max(0.0, bucket_cube_reward) \
                           + self.small_action_norm_reward_factor * action_norm_reward
 
         # If some agent scored a point, the score change is returned instead of the progress reward to avoid an

@@ -47,10 +47,10 @@ if __name__ == "__main__":
         "env_kwargs": {
             "gripper_to_closest_cube_reward_factor": 0.1,
             "closest_cube_to_bucket_reward_factor": 0.1,
-            "small_action_norm_reward_factor": 1,
-            "base_reward": 0.1
+            "small_action_norm_reward_factor": 0,
+            "base_reward": 0
         },
-        "notes": "Simplified progress reward env with PPO",  # adjust this before every run
+        "notes": "Nonnegative progress reward with PPO",  # adjust this before every run
         "rl_algo": PPO,
         "total_timesteps": int(1e6),
         "log_interval": 1,  # for on-policy algos: #steps, for off-policy algos: #episodes
