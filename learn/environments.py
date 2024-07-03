@@ -317,9 +317,9 @@ class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
         ik_action0, ik_action1 = super()._compose_control(rl_action)
         action_arm0 = ik_action0
         if self.ik_policy0.state is not PolicyState.IDLE:
-            action_arm0 += 0.25 * self._process_action(rl_action[0:8])
+            action_arm0 += 0.5 * self._process_action(rl_action[0:8])
         action_arm1 = ik_action1
         if self.ik_policy1.state is not PolicyState.IDLE:
-            action_arm1 += 0.25 * self._process_action(rl_action[8:16])
+            action_arm1 += 0.5 * self._process_action(rl_action[8:16])
 
         return action_arm0, action_arm1
