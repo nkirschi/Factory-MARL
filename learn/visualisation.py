@@ -21,6 +21,7 @@ for e in range(num_episodes):
     for t in itertools.count():
         action, _states = model.predict(obs)
         obs, reward, terminate, truncate, info = env.step(action)
+        print(f"IK states: ({env.ik_policy1.state.name}, {env.ik_policy0.state.name})")
         print(f"reward: {reward:.4f}")
         if terminate:
             print(
