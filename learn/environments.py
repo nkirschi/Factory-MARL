@@ -254,8 +254,8 @@ class ProgressRewardEnv(TaskEnv):
 
         score_reward = super()._get_reward(state, action, info)
         progress_reward = self.base_reward \
-                          + self.gripper_to_closest_cube_reward_factor * max(0.0, gripper_cube_reward) \
-                          + self.closest_cube_to_bucket_reward_factor * max(0.0, bucket_cube_reward) \
+                          + self.gripper_to_closest_cube_reward_factor * gripper_cube_reward \
+                          + self.closest_cube_to_bucket_reward_factor * bucket_cube_reward \
                           + self.small_action_norm_reward_factor * action_norm_reward
 
         # If some agent scored a point, the score change is returned instead of the progress reward to avoid an
@@ -282,8 +282,24 @@ class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
         ik_action0, ik_action1 = super()._compose_control(rl_action)
         action_arm0 = ik_action0
         if self.ik_policy0.state is not PolicyState.IDLE:
-            action_arm0 += 0.25 * self._process_action(rl_action)
+            action_arm0 += 0.5 * self._process_action(rl_action)
         action_arm1 = ik_action1
+        return action_arm0, action_arm1
+
+
+class DoubleFullRLProgressRewardEnv(ProgressRewardEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        action_dims = 2 * self.dof
+        self.action_space = spaces.Box(
+            low=-np.ones(action_dims),
+            high=np.ones(action_dims),
+            dtype=np.float32
+        )
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self._process_action(rl_action[0:8])
+        action_arm1 = self._process_action(rl_action[8:16])
         return action_arm0, action_arm1
 
 
