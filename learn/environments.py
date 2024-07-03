@@ -75,6 +75,7 @@ class TaskEnv(BaseEnv):
         # A common choice is to let the policy output actions in the range [-1, 1]
         # and scale them to the desired range here
         # action = np.clip(action, -1.0, 1.0)
+        print(action)
         action = np.tanh(action)
         bounds = self.joint_limits.copy()  # joint_limits is a property of BaseEnv
         low, high = bounds.T
@@ -322,4 +323,59 @@ class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
         if self.ik_policy1.state is not PolicyState.IDLE:
             action_arm1 += 0.5 * self._process_action(rl_action[8:16])
 
+        return action_arm0, action_arm1
+
+
+class IKToggleEnv(TaskEnv):
+    NUM_AGENTS = 2
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        action_dims = self.NUM_AGENTS
+        self.action_space = spaces.Box(
+            low=-np.ones(action_dims),
+            high=np.ones(action_dims),
+            dtype=np.float32
+        )
+
+        obs_dims = 6 * self.dof + 13 * self.max_num_objects + self.dof * self.NUM_AGENTS  # add proposed IK actions
+        self.observation_space = spaces.Box(
+            low=-np.inf * np.ones(obs_dims),
+            high=np.inf * np.ones(obs_dims),
+            dtype=np.float32,
+        )
+
+    def _process_observation(self, state: np.ndarray) -> np.ndarray:
+        obs = super()._process_observation(state)
+        self.ik_action0, self.ik_action1 = super()._compose_control(None)
+        obs = np.concatenate([obs, self.ik_action0, self.ik_action1])
+        return obs
+
+    def _get_reward(self, state, action, info) -> float:
+        reward = super()._get_reward(state, action, info)
+        reward += action.sum() / 1000
+        return reward
+
+
+class PauseIKToggleEnv(IKToggleEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.last_action_arm0 = np.zeros(self.dof)
+        self.last_action_arm1 = np.zeros(self.dof)
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self.ik_action0 if rl_action[0] > 0 else self.last_action_arm0
+        action_arm1 = self.ik_action1 if rl_action[1] > 0 else self.last_action_arm1
+        self.last_action_arm0 = action_arm0
+        self.last_action_arm1 = action_arm1
+        return action_arm0, action_arm1
+
+
+class BackupIKToggleEnv(IKToggleEnv):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+
+    def _compose_control(self, rl_action):
+        action_arm0 = self.ik_action0 if rl_action[0] > 0 else self.ik_policy0.default_pose
+        action_arm1 = self.ik_action1 if rl_action[1] > 0 else self.ik_policy1.default_pose
         return action_arm0, action_arm1
