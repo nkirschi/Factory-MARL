@@ -1,0 +1,527 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20240705104135" modified="D:20240711172309" tex="xetex"/>
+<preamble>\usepackage{graphicx}
+\usepackage{forest}
+\usepackage{tcolorbox}
+\usepackage{fontspec}
+\usepackage{amsfonts, amssymb, mathtools, bm}
+\usepackage{siunitx}
+\usepackage[shortlabels]{enumitem}
+\usepackage{caption}
+\usepackage{booktabs} 
+\usepackage{multirow}
+\usepackage[symbol]{footmisc}
+
+
+%\setsansfont{DejaVu Sans}
+\renewcommand{\familydefault}{\sfdefault}
+
+
+\definecolor{oxblue}{HTML}{002147}
+\definecolor{tumblue}{HTML}{2C71B5}
+\tcbset{
+colback=white,
+colframe=oxblue, 
+fonttitle=\bfseries,
+left=6pt,
+right=6pt,
+}
+\sisetup{reset-math-version = false}
+
+
+% custom commands
+
+% general
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\diff}{\mathrm{d}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\DeclareMathOperator{\score}{\varrho}
+
+% graph-related
+\newcommand{\graph}{\mathcal{G}}
+\newcommand{\vertices}{\mathcal{V}}
+\newcommand{\edges}{\mathcal{E}}
+\newcommand{\predecessors}{\vertices_{\mathrm{in}}}
+\newcommand{\successors}{\vertices_{\mathrm{out}}}
+\newcommand{\featMat}{\mat{X}}
+\newcommand{\featVec}{\vect{x}}
+\newcommand{\trueVecSymb}{y}
+\newcommand{\trueVec}{\vect{\trueVecSymb}}
+\newcommand{\predVecSymb}{\hat{\trueVecSymb}}
+\newcommand{\predVec}{\vect{\predVecSymb}}
+\newcommand{\qMatSymb}{Q}
+\newcommand{\qMat}{\mat{\qMatSymb}}
+\newcommand{\qVec}{\bm{q}}
+\newcommand{\adjMatSymb}{A}
+\newcommand{\adjMat}{\mat{\adjMatSymb}}
+\newcommand{\adjMatHat}{\mat{\hat{\adjMatSymb}}}
+\newcommand{\adjMatNormSymb}{\bar{\adjMatSymb}}
+\newcommand{\adjMatNorm}{\mat{\adjMatNormSymb}}
+\newcommand{\dIn}{\mathrm{in}}
+\newcommand{\dOut}{\mathrm{out}}
+\newcommand{\degMatSymb}{D}
+\newcommand{\degMat}{\mat{\degMatSymb}}
+\newcommand{\degMatHat}{\mat{\hat{\degMatSymb}}}
+\newcommand{\incMatSymb}{\nabla}
+\newcommand{\incMat}{\bm{\incMatSymb}}
+\newcommand{\lapMatSymb}{\Delta}
+\newcommand{\lapMat}{\mat{\lapMatSymb}}
+\newcommand{\permMatSymb}{P_\pi}
+\newcommand{\permMat}{\mat{\permMatSymb}}
+
+% NLA-related
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\idMat}{\mathbf{I}}
+\newcommand{\eigVecMat}{\mat{U}}
+\newcommand{\eigValMat}{\mat{\Lambda}}
+\newcommand{\zeroMat}{\mat{0}}
+\newcommand{\extMixMatSymb}{\Omega}
+\newcommand{\extMixMat}{\mat{\extMixMatSymb}}
+\newcommand{\intMixMatSymb}{\Theta}
+\newcommand{\intMixMat}{\mat{\intMixMatSymb}}
+\newcommand{\choleskyMatSymb}{\Theta}
+\newcommand{\choleskyMat}{\mathbf{\Theta}}
+\newcommand{\sym}[1]{{#1}^{\operatorname{sym}}}
+
+% GCN-related
+\newcommand{\act}{\sigma}
+\newcommand{\params}{\theta}
+\newcommand{\Params}{\bm{\Theta}}
+\DeclareMathOperator{\ReLU}{ReLU}
+\DeclareMathOperator{\GCNConv}{GCNLayer}
+\DeclareMathOperator{\ResGCNConv}{ResGCNLayer}
+\DeclareMathOperator{\GCNIIConv}{GCNIILayer}
+\DeclareMathOperator{\ResGATLayer}{ResGATLayer}
+\newcommand{\rhs}{\operatorname{GNNLayer}_\params}
+\newcommand{\gnnlayer}{\operatorname{GNNLayer}}
+\newcommand{\encoder}{\operatorname{Encoder}}
+\newcommand{\decoder}{\operatorname{Decoder}}
+\newcommand{\energy}{\mathsf{E}}
+\newcommand{\dirEnergy}{\energy_{\text{\scshape dir}}}
+\newcommand{\paramEnergy}{\energy_{\theta}}
+\newcommand{\step}{\tau}
+
+% statistics
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\meanVec}{\bm{\mu}}
+\newcommand{\stdVec}{\bm{\sigma}}
+
+% metrics
+\DeclareMathOperator{\mse}{MSE}
+\DeclareMathOperator{\nse}{NSE}
+
+\newcommand{\cell}[2]{\begin{tabular}[x]{@{}r@{}}#1\\\textcolor{darkgray}{\tiny $\pm$#2}\end{tabular}}
+    \newcommand{\error}[2]{\cell{\qty{#1}{}}{\qty{#2}{}}}
+    \newcommand{\nash}[2]{\cell{\footnotesize\qty{#1}{\percent}}{\qty{#2}{\percent}}}
+
+\renewcommand\ttdefault{cmvtt}
+
+\DeclareFontFamily{U}{matha}{\hyphenchar\font45}
+\DeclareFontShape{U}{matha}{m}{n}{
+	&lt;5&gt; &lt;6&gt; &lt;7&gt; &lt;8&gt; &lt;9&gt; &lt;10&gt; gen * matha
+	&lt;10.95&gt; matha10 &lt;12&gt; &lt;14.4&gt; &lt;17.28&gt; &lt;20.74&gt; &lt;24.88&gt; matha12
+}{}
+\DeclareSymbolFont{matha}{U}{matha}{m}{n}
+\DeclareMathSymbol{\odiv}         {2}{matha}{&quot;63}
+
+\makeatletter
+\def\moverlay{\mathpalette\mov@rlay}
+\def\mov@rlay#1#2{\leavevmode\vtop{%
+		\baselineskip\z@skip \lineskiplimit-\maxdimen
+		\ialign{\hfil$\m@th#1##$\hfil\cr#2\crcr}}}
+\newcommand{\charfusion}[3][\mathord]{
+	#1{\ifx#1\mathop\vphantom{#2}\fi
+		\mathpalette\mov@rlay{#2\cr#3}
+	}
+	\ifx#1\mathop\expandafter\displaylimits\fi}
+\makeatother
+
+
+\newcommand{\cupdot}{\charfusion[\mathbin]{\cup}{\cdot}}
+\newcommand{\bigcupdot}{\charfusion[\mathop]{\bigcup}{\cdot}}</preamble>
+<ipestyle name="basic">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/farc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/ptarc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/fptarc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="mark/circle(sx)" transformations="translations">
+<path fill="sym-stroke">
+0.6 0 0 0.6 0 0 e
+0.4 0 0 0.4 0 0 e
+</path>
+</symbol>
+<symbol name="mark/disk(sx)" transformations="translations">
+<path fill="sym-stroke">
+0.6 0 0 0.6 0 0 e
+</path>
+</symbol>
+<symbol name="mark/fdisk(sfx)" transformations="translations">
+<group>
+<path fill="sym-fill">
+0.5 0 0 0.5 0 0 e
+</path>
+<path fill="sym-stroke" fillrule="eofill">
+0.6 0 0 0.6 0 0 e
+0.4 0 0 0.4 0 0 e
+</path>
+</group>
+</symbol>
+<symbol name="mark/box(sx)" transformations="translations">
+<path fill="sym-stroke" fillrule="eofill">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+-0.4 -0.4 m
+0.4 -0.4 l
+0.4 0.4 l
+-0.4 0.4 l
+h
+</path>
+</symbol>
+<symbol name="mark/square(sx)" transformations="translations">
+<path fill="sym-stroke">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+</path>
+</symbol>
+<symbol name="mark/fsquare(sfx)" transformations="translations">
+<group>
+<path fill="sym-fill">
+-0.5 -0.5 m
+0.5 -0.5 l
+0.5 0.5 l
+-0.5 0.5 l
+h
+</path>
+<path fill="sym-stroke" fillrule="eofill">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+-0.4 -0.4 m
+0.4 -0.4 l
+0.4 0.4 l
+-0.4 0.4 l
+h
+</path>
+</group>
+</symbol>
+<symbol name="mark/cross(sx)" transformations="translations">
+<group>
+<path fill="sym-stroke">
+-0.43 -0.57 m
+0.57 0.43 l
+0.43 0.57 l
+-0.57 -0.43 l
+h
+</path>
+<path fill="sym-stroke">
+-0.43 0.57 m
+0.57 -0.43 l
+0.43 -0.57 l
+-0.57 0.43 l
+h
+</path>
+</group>
+</symbol>
+<symbol name="arrow/fnormal(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/pointed(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/fpointed(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/linear(spx)">
+<path stroke="sym-stroke" pen="sym-pen">
+-1 0.333 m
+0 0 l
+-1 -0.333 l
+</path>
+</symbol>
+<symbol name="arrow/fdouble(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+-1 0 m
+-2 0.333 l
+-2 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/double(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+-1 0 m
+-2 0.333 l
+-2 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-normal(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-fnormal(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-pointed(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.3 0 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-fpointed(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.3 0 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-double(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+1 0 m
+0 0.333 l
+0 -0.333 l
+h
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-fdouble(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+1 0 m
+0 0.333 l
+0 -0.333 l
+h
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<anglesize name="22.5 deg" value="22.5"/>
+<anglesize name="30 deg" value="30"/>
+<anglesize name="45 deg" value="45"/>
+<anglesize name="60 deg" value="60"/>
+<anglesize name="90 deg" value="90"/>
+<arrowsize name="large" value="10"/>
+<arrowsize name="small" value="5"/>
+<arrowsize name="tiny" value="3"/>
+<color name="blue" value="0 0 1"/>
+<color name="brown" value="0.647 0.165 0.165"/>
+<color name="darkblue" value="0 0 0.545"/>
+<color name="darkcyan" value="0 0.545 0.545"/>
+<color name="darkgray" value="0.663"/>
+<color name="darkgreen" value="0 0.392 0"/>
+<color name="darkmagenta" value="0.545 0 0.545"/>
+<color name="darkorange" value="1 0.549 0"/>
+<color name="darkred" value="0.545 0 0"/>
+<color name="gold" value="1 0.843 0"/>
+<color name="gray" value="0.745"/>
+<color name="green" value="0 1 0"/>
+<color name="lightblue" value="0.678 0.847 0.902"/>
+<color name="lightcyan" value="0.878 1 1"/>
+<color name="lightgray" value="0.827"/>
+<color name="lightgreen" value="0.565 0.933 0.565"/>
+<color name="lightyellow" value="1 1 0.878"/>
+<color name="navy" value="0 0 0.502"/>
+<color name="orange" value="1 0.647 0"/>
+<color name="pink" value="1 0.753 0.796"/>
+<color name="purple" value="0.627 0.125 0.941"/>
+<color name="red" value="1 0 0"/>
+<color name="seagreen" value="0.18 0.545 0.341"/>
+<color name="turquoise" value="0.251 0.878 0.816"/>
+<color name="violet" value="0.933 0.51 0.933"/>
+<color name="yellow" value="1 1 0"/>
+<dashstyle name="dash dot dotted" value="[4 2 1 2 1 2] 0"/>
+<dashstyle name="dash dotted" value="[4 2 1 2] 0"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<gridsize name="10 pts (~3.5 mm)" value="10"/>
+<gridsize name="14 pts (~5 mm)" value="14"/>
+<gridsize name="16 pts (~6 mm)" value="16"/>
+<gridsize name="20 pts (~7 mm)" value="20"/>
+<gridsize name="28 pts (~10 mm)" value="28"/>
+<gridsize name="32 pts (~12 mm)" value="32"/>
+<gridsize name="4 pts" value="4"/>
+<gridsize name="56 pts (~20 mm)" value="56"/>
+<gridsize name="8 pts (~3 mm)" value="8"/>
+<opacity name="10%" value="0.1"/>
+<opacity name="30%" value="0.3"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="75%" value="0.75"/>
+<pen name="fat" value="1.2"/>
+<pen name="heavier" value="0.8"/>
+<pen name="ultrafat" value="2"/>
+<symbolsize name="large" value="5"/>
+<symbolsize name="small" value="2"/>
+<symbolsize name="tiny" value="1.1"/>
+<textsize name="Huge" value="\Huge"/>
+<textsize name="LARGE" value="\LARGE"/>
+<textsize name="Large" value="\Large"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="huge" value="\huge"/>
+<textsize name="large" value="\large"/>
+<textsize name="script" value="\scriptsize"/>
+<textsize name="small" value="\small"/>
+<textsize name="tiny" value="\tiny"/>
+<textstyle name="center" begin="\begin{center}" end="\end{center}"/>
+<textstyle name="item" begin="\begin{itemize}\item{}" end="\end{itemize}"/>
+<textstyle name="itemize" begin="\begin{itemize}" end="\end{itemize}"/>
+<tiling name="falling" angle="-60" step="4" width="1"/>
+<tiling name="rising" angle="30" step="4" width="1"/>
+</ipestyle>
+<ipestyle name="posterstyle">
+<color name="oxblue" value="0 0.129 0.278"/>
+<color name="tumblue" value="0.173 0.443 0.71"/>
+<textstretch name="Huge" value="1.1"/>
+<textstretch name="LARGE" value="1"/>
+<textstretch name="Large" value="1"/>
+<textstretch name="footnote" value="1"/>
+<textstretch name="huge" value="1"/>
+<textstretch name="large" value="1"/>
+<textstretch name="normal" value="1"/>
+<textstretch name="small" value="1"/>
+<textstretch name="tiny" value="1"/>
+<layout paper="960 540" origin="0 0" frame="960 540" crop="no"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<text layer="alpha" matrix="1 0 0 1 614.919 16" transformations="translations" pos="144 512" stroke="black" type="minipage" width="160" height="29.398" depth="24.46" valign="top">\includegraphics[height=1.9cm]{TUM_Logo}</text>
+<text matrix="1 0 0 1 -240.611 -148.649" transformations="translations" pos="256 672" stroke="tumblue" type="minipage" width="736" height="15.1646" depth="9.702" valign="top" size="Huge">\bfseries Cooperative Multi-agent RL for Factory Manipulation</text>
+<text matrix="1 0 0 1 -0.611 -130.707" transformations="translations" pos="16 624" stroke="black" type="minipage" width="736" height="9.539" depth="4.56" valign="top" size="LARGE">Nikolas Kirschstein, Kassian Köck</text>
+<text matrix="0.947368 0 0 0.713726 272.842 100.272" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="122.041" depth="117.35" valign="top">\begin{tcolorbox}[adjusted title=Adjacency Choices , colframe=tumblue]
+Given: river graph $(\mathcal{V}, \mathcal{E})$ with adjacency matrix $\mathbf{A} \in \R^{\lvert \mathcal{V} \rvert \times \lvert \mathcal{V} \rvert}$
+\begin{enumerate}[(1)]
+	\item \textbf{isolated:} $\adjMat_{i,j} \coloneqq 0$ equates to removing all edges and results in the augmented normalised adjacency matrix to be a multiple of the identity so that each GNN layer degenerates to a node-wise linear layer
+	\item \textbf{binary:} $\adjMat_{i,j} \coloneqq 1$ corresponds to the unaltered adjacency matrix as it comes with the LamaH-CE dataset
+ \newpage
+	\item \textbf{weighted:} $\adjMat_{i,j} \coloneqq {w}_{(i,j)}$ quantifies a physical relationship:
+	\begin{enumerate}[label=(3.\arabic*), left=4pt]
+	\item \textbf{stream length} along the river between $i$ and $j$
+	\item \textbf{elevation difference} along the river between $i$ and $j$
+	\item \textbf{average slope} of the river between $i$ and $j$
+	\end{enumerate}
+	\item \textbf{learnt:} $\adjMat_{i,j} \coloneqq {\omega}_{(i,j)}$ where $\vect{\omega} \in \R^{\abs{\edges}}$ is a learnable model parameter
+\end{enumerate}
+\end{tcolorbox}</text>
+<text matrix="0.947368 0 0 0.713726 0.842 100.843" transformations="translations" pos="16 496" stroke="black" type="minipage" width="256" height="87.859" depth="83.08" valign="top">\begin{tcolorbox}[adjusted title=The Big Picture,colframe=orange]
+\textbf{Hypothesis:} Making a neural discharge predictor aware of the river graph structure improves forecasting performance
+
+\vspace*{1em}
+
+\textbf{Result:} Negative!
+\begin{itemize}[itemsep=1pt]
+\item Performance seems independent of graph topology
+\item Learnt edge weights correlate with neither of those from the dataset
+\end{itemize}
+\vspace*{1em}
+
+\textbf{Limitations:} Single dataset, generic GNN architectures
+\end{tcolorbox}
+
+</text>
+<text matrix="1 0 0 1 432.504 -97.9597" transformations="translations" pos="432 624" stroke="tumblue" type="minipage" width="96" height="29.368" depth="24.43" valign="top" size="Large">\begin{tabular}{l}
+Technical \\
+University of \\
+Munich
+\end{tabular}</text>
+<text matrix="0.947368 0 0 0.713726 592.842 100.272" transformations="translations" pos="16 496" stroke="black" type="minipage" width="336" height="52.163" depth="47.29" valign="top">\begin{tcolorbox}[adjusted title= Task Formulation, colframe=tumblue]
+\begin{tabular}{ll}
+\textbf{in:} &amp;
+$\mathbf{X} \in \R^{\lvert \mathcal{V} \rvert \times 24 \times 5}$ measurements\footnotemark\footnotetext{*discharge, precipitation, topsoil moisture, air temperature, surface pressure\vspace*{-2mm}} from the last 24 hours at every gauge
+\\ &amp;
+$\mathbf{A} \in \R^{\lvert \mathcal{V} \rvert \times \lvert \mathcal{V} \rvert}$ modified adjacency matrix (see &quot;Adjacency Choices&quot;)\\&amp;\\
+\textbf{out:}\hspace*{-2mm} &amp; $\bm{y} \in \R^{\lvert \mathcal{V} \rvert}$ discharge 6 hours from now at every gauge
+\end{tabular}
+\end{tcolorbox}</text>
+</page>
+</ipe>

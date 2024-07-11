@@ -1,0 +1,14 @@
+<ipestyle name="posterstyle">
+   <layout paper="960 540" origin="0 0" frame="960 540" crop="no"/>
+   <color name="oxblue" value="0 0.129 0.278"/>
+   <color name="tumblue" value="0.173 0.443 0.710"/>
+   <textstretch name="normal" value="1"/>
+   <textstretch name="large" value="1"/>
+   <textstretch name="small" value="1"/>
+   <textstretch name="tiny" value="1"/>
+   <textstretch name="huge" value="1"/>
+   <textstretch name="footnote" value="1"/>
+   <textstretch name="Large" value="1"/>
+   <textstretch name="LARGE" value="1"/>
+   <textstretch name="Huge" value="1.1"/>
+</ipestyle>
