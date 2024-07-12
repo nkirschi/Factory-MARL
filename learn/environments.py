@@ -39,6 +39,8 @@ class TaskEnv(BaseEnv):
             dtype=np.float32
         )
 
+        self.ep_score_history = []
+
     def _process_observation(self, state: np.ndarray) -> np.ndarray:
         """
         Your custom feature representation logic goes here.
@@ -127,11 +129,11 @@ class TaskEnv(BaseEnv):
             action_arm0=action_arm0, action_arm1=action_arm1
         )
 
-        # TODO terminate = ... dependent on info
-
         reward = self._get_reward(state, action, info)
         obs = self._process_observation(state)
         self.last_score = info["scores"].copy()
+        if terminate:
+            self.ep_score_history.append(self.last_score)
         return obs, reward, terminate, False, info
 
     def reset(
@@ -144,7 +146,7 @@ class TaskEnv(BaseEnv):
         self.ik_policy0.reset()
         self.ik_policy1.reset()
         obs = self._process_observation(state)
-        self.last_score = info["scores"]
+        self.last_score = info["scores"].copy()
 
         return obs, {}
 

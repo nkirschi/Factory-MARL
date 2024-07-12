@@ -6,6 +6,7 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
 from environments import *
 from wandb.integration.sb3 import WandbCallback
 
+import numpy as np
 import os
 import wandb
 
@@ -20,9 +21,10 @@ class AdditionalMetricsCallback(BaseCallback):
 
     def _on_step(self) -> bool:
         try:
-            scores = self.training_env.get_attr("last_score")
-            for i, total_score in enumerate(map(sum, scores)):
-                self.logger.record(f"rollout/ep_score_env{i}", total_score)
+            score_history = np.array(self.training_env.get_attr("ep_score_history"))
+            mean_arm_scores = score_history.mean(axis=(0, 1))
+            for arm_id, mean_arm_score in enumerate(mean_arm_scores):
+                self.logger.record(f"rollout/ep_score_mean_arm{arm_id}", mean_arm_score)
         except AttributeError:
             raise AssertionError("Property last_score not present in env object", self.training_env)
         return True
