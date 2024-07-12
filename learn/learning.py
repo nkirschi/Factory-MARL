@@ -22,11 +22,14 @@ class AdditionalMetricsCallback(BaseCallback):
     def _on_step(self) -> bool:
         try:
             score_history = np.array(self.training_env.get_attr("ep_score_history"))
+        except AttributeError:
+            raise AssertionError("Property ep_score_history not present in env object", self.training_env)
+
+        if score_history.ndim == 3:  # non-empty history
             mean_arm_scores = score_history.mean(axis=(0, 1))
             for arm_id, mean_arm_score in enumerate(mean_arm_scores):
                 self.logger.record(f"rollout/ep_score_mean_arm{arm_id}", mean_arm_score)
-        except AttributeError:
-            raise AssertionError("Property last_score not present in env object", self.training_env)
+
         return True
 
 
