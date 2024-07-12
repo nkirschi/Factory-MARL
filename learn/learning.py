@@ -1,12 +1,12 @@
-from stable_baselines3 import PPO, SAC
 from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
-from environments import *
 from wandb.integration.sb3 import WandbCallback
 
+import environments
 import os
+import stable_baselines3
 import wandb
 
 
@@ -48,8 +48,9 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
 if __name__ == "__main__":
     CONFIG = dict(
         num_envs=8,
-        env_class=BackupIKToggleEnv,
+        env_class="BackupIKToggleEnv",
         env_kwargs={
+            "render_mode": "rgb_array",
             "max_num_objects": 5,
             # gripper_to_closest_cube_reward_factor=0.1,
             # closest_cube_to_bucket_reward_factor=0.1,
@@ -57,7 +58,7 @@ if __name__ == "__main__":
             # base_reward=0
         },
         notes="TODO",  # adjust this before every run
-        rl_algo=PPO,
+        rl_algo="PPO",
         total_timesteps=int(2e6),
         chkpt_interval=int(2e6 / 10),
         policy_type="MlpPolicy",
@@ -74,7 +75,7 @@ if __name__ == "__main__":
                      sync_tensorboard=True,
                      monitor_gym=True,
                      save_code=True)
-    env = make_vec_env(lambda: Monitor(CONFIG["env_class"](render_mode="rgb_array", **CONFIG["env_kwargs"])),
+    env = make_vec_env(lambda: Monitor(getattr(environments, CONFIG["env_class"])(**CONFIG["env_kwargs"])),
                        n_envs=CONFIG["num_envs"],
                        vec_env_cls=SubprocVecEnv)
     env.reset()
@@ -82,12 +83,14 @@ if __name__ == "__main__":
     #                        video_folder=f"runs/{run.id}/videos",
     #                        record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
     #                        video_length=100)
-    model = CONFIG["rl_algo"](policy=CONFIG["policy_type"],
-                              policy_kwargs=CONFIG["policy_kwargs"],
-                              env=env,
-                              tensorboard_log=f"runs/{run.id}/tensorboard",
-                              verbose=1)
-
+    model = getattr(stable_baselines3, CONFIG["rl_algo"])(policy=CONFIG["policy_type"],
+                                                          policy_kwargs=CONFIG["policy_kwargs"],
+                                                          env=env,
+                                                          tensorboard_log=f"runs/{run.id}/tensorboard",
+                                                          verbose=1)
+    print(env)
+    print(model.policy)
+    exit()
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                                       save_path=f"runs/{run.id}/checkpoints"),
