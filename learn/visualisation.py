@@ -6,7 +6,7 @@ from environments import *
 # BEGIN CONFIGURABLE PART #
 
 rl_algo = PPO
-env_type = BackupIKToggleEnv
+env_class = BackupIKToggleEnv
 env_kwargs = dict(
     render_mode="human",
     width=1024,
@@ -20,7 +20,7 @@ env_kwargs = dict(
 # END CONFIGURABLE PART #
 
 
-env = env_type(**env_kwargs)
+env = env_class(**env_kwargs)
 obs, info = env.reset()
 num_episodes = 10
 
