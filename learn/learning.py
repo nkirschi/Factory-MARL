@@ -87,9 +87,6 @@ if __name__ == "__main__":
                                                           env=env,
                                                           tensorboard_log=f"runs/{run.id}/tensorboard",
                                                           verbose=1)
-    print(env)
-    print(model.policy)
-    exit()
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["total_timesteps"] // 10 // CONFIG["num_envs"],
                                                       save_path=f"runs/{run.id}/checkpoints"),
