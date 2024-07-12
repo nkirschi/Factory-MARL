@@ -1,10 +1,8 @@
-
-from gymnasium.wrappers import NormalizeReward
 from stable_baselines3 import PPO, SAC
-from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback, ProgressBarCallback
+from stable_baselines3.common.callbacks import BaseCallback, CheckpointCallback
 from stable_baselines3.common.env_util import make_vec_env
 from stable_baselines3.common.monitor import Monitor
-from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv, VecVideoRecorder
+from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
 from environments import *
 from wandb.integration.sb3 import WandbCallback
 
