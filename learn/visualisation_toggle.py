@@ -7,7 +7,8 @@ env = BackupIKToggleEnv(render_mode="human")
 obs, info = env.reset()
 num_episodes = 10
 
-model = PPO.load("policies/Backup.zip")
+model = PPO.load("policies/BackupIKToggleEnv_10000000_steps.zip")
+
 
 for e in range(num_episodes):
     tick = time.time()
