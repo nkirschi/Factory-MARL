@@ -6,7 +6,6 @@ from stable_baselines3.common.vec_env import SubprocVecEnv, VecVideoRecorder
 from environments import *
 from wandb.integration.sb3 import WandbCallback
 
-import numpy as np
 import os
 import wandb
 
@@ -16,20 +15,19 @@ class AdditionalMetricsCallback(BaseCallback):
     Custom callback for plotting additional metrics in tensorboard.
     """
 
+    NUM_ARMS = 2
+
     def __init__(self):
         super().__init__()
 
     def _on_step(self) -> bool:
         try:
-            score_history = np.array(self.training_env.get_attr("ep_score_history"))
+            score_history = self.training_env.get_attr("ep_score_history")
+            for arm_id in range(self.NUM_ARMS):
+                arm_scores = sum([score_history[e][-100:][arm_id] for e in range(len(score_history))], [])
+                self.logger.record(f"rollout/ep_score_mean_arm{arm_id}", sum(arm_scores) / len(arm_scores))
         except AttributeError:
             raise AssertionError("Property ep_score_history not present in env object", self.training_env)
-
-        if score_history.ndim == 3:  # non-empty history
-            mean_arm_scores = score_history.mean(axis=(0, 1))
-            for arm_id, mean_arm_score in enumerate(mean_arm_scores):
-                self.logger.record(f"rollout/ep_score_mean_arm{arm_id}", mean_arm_score)
-
         return True
 
 
