@@ -21,8 +21,8 @@ class AdditionalMetricsCallback(BaseCallback):
     def _on_step(self) -> bool:
         try:
             scores = self.training_env.get_attr("last_score")
-            avg_total_score = sum(map(sum, scores)) / len(scores)
-            self.logger.record("rollout/ep_score_last", avg_total_score)
+            for i, total_score in enumerate(map(sum, scores)):
+                self.logger.record(f"rollout/ep_score_env{i}", total_score)
         except AttributeError:
             raise AssertionError("Property last_score not present in env object", self.training_env)
         return True
@@ -40,22 +40,25 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
 
 
 if __name__ == "__main__":
-    CONFIG = {
-        "num_envs": 8,
-        "env_class": SingleDeltaProgressRewardEnv,
-        "env_kwargs": {
-            "gripper_to_closest_cube_reward_factor": 0.1,
-            "closest_cube_to_bucket_reward_factor": 0.1,
-            "small_action_norm_reward_factor": 0,
-            "base_reward": 0
+    CONFIG = dict(
+        num_envs=8,
+        env_class=BackupIKToggleEnv,
+        env_kwargs={
+            "max_num_objects": 5,
+            # gripper_to_closest_cube_reward_factor=0.1,
+            # closest_cube_to_bucket_reward_factor=0.1,
+            # small_action_norm_reward_factor=0,
+            # base_reward=0
         },
-        "notes": "Nonnegative progress reward with PPO",  # adjust this before every run
-        "rl_algo": PPO,
-        "total_timesteps": int(1e6),
-        "log_interval": 1,  # for on-policy algos: #steps, for off-policy algos: #episodes
-        "chkpt_interval": int(1e6 / 10),
-        "policy_type": "MlpPolicy",
-    }
+        notes="TODO",  # adjust this before every run
+        rl_algo=PPO,
+        total_timesteps=int(2e6),
+        chkpt_interval=int(2e6 / 10),
+        policy_type="MlpPolicy",
+        policy_kwargs={
+            "net_arch": [512, 512]
+        }
+    )
 
     # os.environ["MUJOCO_GL"] = "osmesa"
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
@@ -73,15 +76,19 @@ if __name__ == "__main__":
     #                        video_folder=f"runs/{run.id}/videos",
     #                        record_video_trigger=lambda x: x % (CONFIG["chkpt_interval"] // CONFIG["num_envs"]) == 0,
     #                        video_length=100)
-    model = CONFIG["rl_algo"](CONFIG["policy_type"], env, verbose=1, tensorboard_log=f"runs/{run.id}/tensorboard")
+    model = CONFIG["rl_algo"](policy=CONFIG["policy_type"],
+                              policy_kwargs=CONFIG["policy_kwargs"],
+                              env=env,
+                              tensorboard_log=f"runs/{run.id}/tensorboard",
+                              verbose=1)
+
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 log_interval=CONFIG["log_interval"],
-                callback=[  # ProgressBarCallback(),
-                    SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                                save_path=f"runs/{run.id}/checkpoints"),
-                    WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
-                                  model_save_path=f"runs/{run.id}/checkpoints",
-                                  verbose=2),
-                    AdditionalMetricsCallback()])
+                callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
+                                                      save_path=f"runs/{run.id}/checkpoints"),
+                          WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
+                                        model_save_path=f"runs/{run.id}/checkpoints",
+                                        verbose=2),
+                          AdditionalMetricsCallback()])
 
     run.finish()
