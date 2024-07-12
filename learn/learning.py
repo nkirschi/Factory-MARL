@@ -83,7 +83,6 @@ if __name__ == "__main__":
                               verbose=1)
 
     model.learn(total_timesteps=CONFIG["total_timesteps"],
-                log_interval=CONFIG["log_interval"],
                 callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
                                                       save_path=f"runs/{run.id}/checkpoints"),
                           WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
