@@ -1,32 +1,31 @@
+import environments
 import itertools
+import shutil
+import stable_baselines3
 import time
-from stable_baselines3 import PPO, SAC
-from environments import *
+import wandb
 
-# BEGIN CONFIGURABLE PART #
+# BEGIN configurable part #
 
-rl_algo = PPO
-env_class = BackupIKToggleEnv
-env_kwargs = dict(
-    render_mode="human",
-    width=1024,
-    height=1024,
-    #gripper_to_closest_cube_reward_factor=0.1,
-    #closest_cube_to_bucket_reward_factor=0.1,
-    #base_reward=0,
-    #small_action_norm_reward_factor=0,
-)
+RUN_ID = "vafxihae"
+CHECKPOINT = 10 / 10  # available: 1 to 10 out of 10
+NUM_EPISODES = 10
 
-# END CONFIGURABLE PART #
+# END configurable part #
 
 
-env = env_class(**env_kwargs)
+api = wandb.Api()
+run = api.run(f"nelorth/adlr/{RUN_ID}")
+chkpt_timestep = int(CHECKPOINT * int(run.config['total_timesteps']))
+model_file = run.file(f"checkpoints/rl_model_{chkpt_timestep}_steps.zip").download("/tmp", replace=True)
+shutil.copy(model_file.name, f"policies/{RUN_ID}.zip")
+
+env = getattr(environments, run.config["env_class"])(**run.config["env_kwargs"])
+model = getattr(stable_baselines3, run.config["rl_algo"]).load(f"policies/{RUN_ID}.zip")
+
 obs, info = env.reset()
-num_episodes = 10
 
-model = rl_algo.load("policies/BackupIKToggleEnv_10000000_steps.zip")
-
-for e in range(num_episodes):
+for e in range(NUM_EPISODES):
     tick = time.time()
     for t in itertools.count():
         action, _states = model.predict(obs)

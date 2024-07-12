@@ -60,7 +60,6 @@ if __name__ == "__main__":
         notes="TODO",  # adjust this before every run
         rl_algo="PPO",
         total_timesteps=int(2e6),
-        chkpt_interval=int(2e6 / 10),
         policy_type="MlpPolicy",
         policy_kwargs={
             "net_arch": [512, 512]
@@ -92,9 +91,9 @@ if __name__ == "__main__":
     print(model.policy)
     exit()
     model.learn(total_timesteps=CONFIG["total_timesteps"],
-                callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
+                callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["total_timesteps"] // 10 // CONFIG["num_envs"],
                                                       save_path=f"runs/{run.id}/checkpoints"),
-                          WandbCallback(model_save_freq=CONFIG["chkpt_interval"] // CONFIG["num_envs"],
+                          WandbCallback(model_save_freq=CONFIG["total_timesteps"] // 10 // CONFIG["num_envs"],
                                         model_save_path=f"runs/{run.id}/checkpoints",
                                         verbose=2),
                           AdditionalMetricsCallback()])
