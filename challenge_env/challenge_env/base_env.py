@@ -23,14 +23,14 @@ class BaseEnv(gym.Env):
         default_camera_config: Optional[Dict[str, Union[float, int]]] = None,
         max_geom: int = 1000,
         visual_options: Dict[int, bool] = {},
-        initial_conveyor_speed: float = 0.05,  # m/s
+        initial_conveyor_speed: float = 0.1,  # m/s
         conveyor_acceleration: float = 0.001,  # m/s^2
         pt_time: float = 0.2,  # s
         force_contact_threshold: float = 100.0,  # threshold for contact forces with arms, above which the episode is terminated
         max_num_objects: int = 10,
         control_frequency: float = 10,  # Hz
-        spawn_freq: float = 1 / 10,
-        spawn_freq_increase: float = 1.0005,
+        spawn_freq: float = 1 / 5,
+        spawn_freq_increase: float = 1.001,
     ):
 
         self.metadata = {
