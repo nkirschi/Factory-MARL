@@ -351,11 +351,6 @@ class IKToggleEnv(TaskEnv):
         obs = np.concatenate([obs, self.ik_action0, self.ik_action1])
         return obs
 
-    def _get_reward(self, state, action, info) -> float:
-        reward = super()._get_reward(state, action, info)
-        reward += action.sum() / 1000
-        return reward
-
 
 class PauseIKToggleEnv(IKToggleEnv):
     def __init__(self, **kwargs):
