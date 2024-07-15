@@ -51,19 +51,28 @@ if __name__ == "__main__":
         env_class="BackupIKToggleEnv",
         env_kwargs={
             "render_mode": "rgb_array",
-            "max_num_objects": 5,
+            "seed": 42,
+            "initial_conveyor_speed": 0.1,
+            "conveyor_acceleration": 0.001,
+            "pt_time": 0.2,
+            "force_contact_threshold": 100.0,
+            "max_num_objects": 10,
+            "control_frequency": 10,
+            "spawn_freq": 1 / 5,
+            "spawn_freq_increase": 1.001,
             # gripper_to_closest_cube_reward_factor=0.1,
             # closest_cube_to_bucket_reward_factor=0.1,
             # small_action_norm_reward_factor=0,
             # base_reward=0
         },
-        notes="TODO",  # adjust this before every run
+        notes="CHANGEME!",  # adjust this before every run
         rl_algo="PPO",
-        total_timesteps=int(2e6),
+        total_timesteps=int(5e6),
         policy_type="MlpPolicy",
         policy_kwargs={
             "net_arch": [512, 512]
-        }
+        },
+        discount_factor=0.99,
     )
 
     # os.environ["MUJOCO_GL"] = "osmesa"
@@ -85,6 +94,7 @@ if __name__ == "__main__":
     model = getattr(stable_baselines3, CONFIG["rl_algo"])(policy=CONFIG["policy_type"],
                                                           policy_kwargs=CONFIG["policy_kwargs"],
                                                           env=env,
+                                                          gamma=CONFIG["discount_factor"],
                                                           tensorboard_log=f"runs/{run.id}/tensorboard",
                                                           verbose=1)
     model.learn(total_timesteps=CONFIG["total_timesteps"],
