@@ -24,18 +24,15 @@ class TaskEnv(BaseEnv):
         self.ik_policy0 = IKPolicy(self, arm_id=0)
         self.ik_policy1 = IKPolicy(self, arm_id=1)
 
-        # Example custom observation and action spaces:
         obs_dims = 6 * self.dof + 13 * self.max_num_objects
         self.observation_space = spaces.Box(
             low=-np.inf * np.ones(obs_dims),
             high=np.inf * np.ones(obs_dims),
             dtype=np.float32,
         )
-
-        action_dims = self.dof
         self.action_space = spaces.Box(
-            low=-np.ones(action_dims),
-            high=np.ones(action_dims),
+            low=-np.empty(0),
+            high=np.empty(0),
             dtype=np.float32
         )
 
@@ -268,6 +265,12 @@ class ProgressRewardEnv(TaskEnv):
 class SingleFullRLProgressRewardEnv(ProgressRewardEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        action_dims = self.dof
+        self.action_space = spaces.Box(
+            low=-np.ones(action_dims),
+            high=np.ones(action_dims),
+            dtype=np.float32
+        )
 
     def _compose_control(self, rl_action):
         _, ik_action1 = super()._compose_control(rl_action)
@@ -279,6 +282,12 @@ class SingleFullRLProgressRewardEnv(ProgressRewardEnv):
 class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        action_dims = self.dof
+        self.action_space = spaces.Box(
+            low=-np.ones(action_dims),
+            high=np.ones(action_dims),
+            dtype=np.float32
+        )
 
     def _compose_control(self, rl_action):
         ik_action0, ik_action1 = super()._compose_control(rl_action)
