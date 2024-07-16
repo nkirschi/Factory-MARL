@@ -73,7 +73,6 @@ class TaskEnv(BaseEnv):
         # A common choice is to let the policy output actions in the range [-1, 1]
         # and scale them to the desired range here
         # action = np.clip(action, -1.0, 1.0)
-        print(action)
         action = np.tanh(action)
         bounds = self.joint_limits.copy()  # joint_limits is a property of BaseEnv
         low, high = bounds.T
