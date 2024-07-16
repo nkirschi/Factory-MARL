@@ -26,7 +26,7 @@ class PolicyState(enum.Enum):
 
 
 class IKPolicy:
-    def __init__(self, env, arm_id: int = 0, verbosity=logging.ERROR):
+    def __init__(self, env, arm_id: int = 0, verbosity=logging.ERROR, bucket_idx=None):
         self.physics = env.physics
         self.env = env
         self.arm_id = arm_id
@@ -44,7 +44,11 @@ class IKPolicy:
         self._base_site = self.physics.named.data.site_xpos[
             f"arm{self.arm_id}/player_site"
         ]
-        self._bucket_pos = self.physics.bind(self.env.task_manager.buckets[arm_id]).xpos
+        if bucket_idx is None and arm_id>1:
+            raise ValueError("bucket_idx must be specified for arm_id > 1")
+        if bucket_idx is None:
+            bucket_idx = arm_id
+        self._bucket_pos = self.physics.bind(self.env.task_manager.buckets[bucket_idx]).xpos
 
         # parameters defining behavior
         self.workspace_radius = 1.0
@@ -55,6 +59,7 @@ class IKPolicy:
         self.pre_grasp_height = 0.15
         self.post_grasp_height = 0.18
         self.target_threshold = 0.05
+        self.release_threshold = 0.1
         self.grasp_offset = 0.04
         self.release_wait = int(0.5 / env.dt)
         self.grasp_wait = int(1.0 / env.dt)
@@ -103,8 +108,10 @@ class IKPolicy:
             return None
 
         pos = self.physics.bind(candidates).qpos.reshape(-1, 7)[:, :3]
+        speculative_pos = pos.copy() 
+        speculative_pos[:, 1] -= 0.2
         dists = np.linalg.norm(
-            pos - self._base_site[None, :],
+            speculative_pos - self._base_site[None, :],
             axis=1,
         )
         closest_object = candidates[np.argmin(dists)]
@@ -201,7 +208,7 @@ class IKPolicy:
                 self.set_state(PolicyState.IDLE)
             else:
                 dist = np.linalg.norm(gripper_pos - self.pre_release_pos)
-                if dist < self.target_threshold:
+                if dist < self.release_threshold:
                     self.set_state(PolicyState.RELEASE)
         elif self.state == PolicyState.RELEASE:
             if self.state_counter > self.release_wait:
