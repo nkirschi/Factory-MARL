@@ -30,7 +30,7 @@ class BaseEnv(gym.Env):
         max_num_objects: int = 10,
         control_frequency: float = 10,  # Hz
         spawn_freq: float = 1 / 5,
-        spawn_freq_increase: float = 1.0005,
+        spawn_freq_increase: float = 1.001,
         num_arms: int = 2,
     ):
 
