@@ -328,12 +328,8 @@ class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
 class IKToggleEnv(TaskEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        action_dims = self.num_arms
-        self.action_space = spaces.Box(
-            low=-np.ones(action_dims),
-            high=np.ones(action_dims),
-            dtype=np.float32
-        )
+
+        self.action_space = spaces.MultiDiscrete(self.num_arms * [2])
 
         obs_dims = 6 * self.dof + 13 * self.max_num_objects + self.dof * self.num_arms  # add proposed IK actions
         self.observation_space = spaces.Box(
@@ -355,8 +351,8 @@ class PauseIKToggleEnv(IKToggleEnv):
         self.last_arm_actions = [np.zeros(self.dof) for _ in range(self.num_arms)]
 
     def _compose_control(self, rl_action):
-        arm_actions = [self.ik_actions[i] if rl_action[i] > 0
-                       else self.last_arm_actions[0]
+        arm_actions = [self.ik_actions[i] if rl_action[i] == 1
+                       else self.last_arm_actions[i]
                        for i in range(self.num_arms)]
         self.last_arm_actions = arm_actions
         return arm_actions
@@ -367,7 +363,7 @@ class BackupIKToggleEnv(IKToggleEnv):
         super().__init__(**kwargs)
 
     def _compose_control(self, rl_action):
-        arm_actions = [self.ik_actions[i] if rl_action[i] > 0
-                       else self.ik_policies[0].default_pose
+        arm_actions = [self.ik_actions[i] if rl_action[i] == 1
+                       else self.ik_policies[i].default_pose
                        for i in range(self.num_arms)]
         return arm_actions
