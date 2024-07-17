@@ -15,8 +15,6 @@ class AdditionalMetricsCallback(BaseCallback):
     Custom callback for plotting additional metrics in tensorboard.
     """
 
-    NUM_ARMS = 2
-
     def __init__(self):
         super().__init__()
 
@@ -24,7 +22,7 @@ class AdditionalMetricsCallback(BaseCallback):
         try:
             score_history = self.training_env.get_attr("ep_score_history")
             if all(score_history):  # no env has empty history
-                for arm_id in range(self.NUM_ARMS):
+                for arm_id in range(self.training_env.get_attr("num_arms")[0]):
                     arm_scores = [score_history[env_id][-t][arm_id]
                                   for env_id in range(len(score_history))
                                   for t in range(min(100, len(score_history[env_id])))]
@@ -50,6 +48,7 @@ if __name__ == "__main__":
         num_envs=8,
         env_class="BackupIKToggleEnv",
         env_kwargs={
+            "num_arms": 4,
             "render_mode": "rgb_array",
             "seed": 42,
             "initial_conveyor_speed": 0.1,
@@ -70,7 +69,7 @@ if __name__ == "__main__":
         total_timesteps=int(5e6),
         policy_type="MlpPolicy",
         policy_kwargs={
-            "net_arch": [512, 512]
+            "net_arch": [128, 128]
         },
         discount_factor=0.99,
     )
