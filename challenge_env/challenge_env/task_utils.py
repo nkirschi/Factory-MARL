@@ -83,7 +83,7 @@ class TaskManager:
 
         # Check if objects are out of scene (failures)
         x_bound = 1.2
-        y_bound = 1.2
+        y_bound = 1.5
         z_bound = 0.9
         oox = np.abs(qpos[:, 0]) > x_bound
         ooy = qpos[:, 1] < -y_bound

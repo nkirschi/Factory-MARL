@@ -7,7 +7,7 @@ import wandb
 
 # BEGIN configurable part #
 
-RUN_ID = "vwq53k5z"
+RUN_ID = None #"vwq53k5z"
 CHECKPOINT = 10 / 10  # available: 1 to 10 out of 10
 NUM_EPISODES = 10
 RESOLUTION = 1024
@@ -17,7 +17,7 @@ RESOLUTION = 1024
 
 if __name__ == "__main__":
     if RUN_ID is None:
-        env = environments.TaskEnv(render_mode="human", width=RESOLUTION, height=RESOLUTION)
+        env = environments.TaskEnv(render_mode="human", width=RESOLUTION, height=RESOLUTION, num_arms=2)
     else:
         api = wandb.Api()
         run = api.run(f"nelorth/adlr/{RUN_ID}")
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             else:
                 action, _states = model.predict(obs)
             obs, reward, terminate, truncate, info = env.step(action)
-            print(f"IK states: ({env.ik_policy1.state.name}, {env.ik_policy0.state.name})")
+            print(f"IK states: {tuple(env.ik_policies[i].state.name for i in range(env.num_arms))}")
             print(f"reward: {reward:.4f}")
             if terminate:
                 print(

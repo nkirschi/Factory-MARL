@@ -135,7 +135,7 @@ def build_scene(num_objects=10, randomize_objects=True, seed=None, num_arms=2):
 
     # buckets
     bucket_dist_x = 0.9
-    bucket_dist_y = 0.7
+    bucket_dist_y = 0.7 - (num_arms // 2 - 1)
     bucket0 = Bucket()
     bucket0.body.set_attributes(pos=[bucket_dist_x, bucket_dist_y, 1.05])
     mjcf_model.attach(bucket0.mjcf_model)
@@ -147,12 +147,12 @@ def build_scene(num_objects=10, randomize_objects=True, seed=None, num_arms=2):
     # arms
 
     assert num_arms % 2 == 0 and num_arms >=2
-    dist_x = 0.6
-    dist_y = 1.2
+    dist_x = 0.7
+    dist_y = 1.4
     arms = []
     for i in range(num_arms):
         x_pos = dist_x * (-1)**i
-        y_pos = dist_y * (i // 2)
+        y_pos = dist_y * (i // 2) - (num_arms // 2 - 1)
         if i in [4, 5]:
             y_pos = 0.5 * dist_y * ((i - 2) // 2)
             x_pos*=0.9

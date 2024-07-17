@@ -76,14 +76,14 @@ class IKPolicy:
         self.last_ctrl = self.default_pose
         self.state = PolicyState.IDLE
         self.target_object = None
-        self.ignore_object = None
+        self.ignore_objects = {}
         self._move_start_pos = None
         self.state_counter = 0
 
         logging.set_verbosity(verbosity)
 
-    def ignore(self, object):
-        self.ignore_object = object
+    def ignore(self, object, owner_id):
+        self.ignore_objects[owner_id] = object
 
     def lin_interp(self, from_pos, to_pos):
         t = self.state_counter / self.move_steps
@@ -92,10 +92,7 @@ class IKPolicy:
     def select_target_object(self):
 
         candidates = copy.copy(self.env.task_manager._in_scene)
-
-        if self.ignore_object is not None:
-            if self.ignore_object in candidates:
-                candidates.remove(self.ignore_object)
+        candidates = list(filter(lambda x: x not in self.ignore_objects.values(), candidates))
 
         # check if the current target object is still feasible
         if self.target_object is not None:

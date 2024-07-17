@@ -21,8 +21,7 @@ class TaskEnv(BaseEnv):
 
         super().__init__(render_mode=render_mode, seed=seed, **kwargs)
 
-        self.ik_policy0 = IKPolicy(self, arm_id=0)
-        self.ik_policy1 = IKPolicy(self, arm_id=1)
+        self.ik_policies = [IKPolicy(self, arm_id=i, bucket_idx=i % 2) for i in range(self.num_arms)]
 
         obs_dims = 6 * self.dof + 13 * self.max_num_objects
         self.observation_space = spaces.Box(
@@ -48,12 +47,12 @@ class TaskEnv(BaseEnv):
             obs: Your custom feature representation as expected by your agent
         """
         joint_states = np.concatenate([
-            state["qpos_player0"].flatten(),
-            state["qvel_player0"].flatten(),
-            state["ctrl_player0"].flatten(),
-            state["qpos_player1"].flatten(),
-            state["qvel_player1"].flatten(),
-            state["ctrl_player1"].flatten(),
+            np.concatenate([
+                state[f"qpos_player{i}"].flatten(),
+                state[f"qvel_player{i}"].flatten(),
+                state[f"ctrl_player{i}"].flatten(),
+            ])
+            for i in range(self.num_arms)
         ])
         object_states = np.concatenate([
             state["object_poses"].flatten(),
@@ -88,13 +87,14 @@ class TaskEnv(BaseEnv):
         """
 
         # Override this in a subclass
-        action_arm0 = self.ik_policy0.act().clip(self.model.actuator_ctrlrange[1:9, 0],
-                                                 self.model.actuator_ctrlrange[1:9, 1])
-        self.ik_policy1.ignore(self.ik_policy0.target_object)
-        action_arm1 = self.ik_policy1.act().clip(self.model.actuator_ctrlrange[9:17, 0],
-                                                 self.model.actuator_ctrlrange[9:17, 1])
-        self.ik_policy0.ignore(self.ik_policy1.target_object)
-        return action_arm0, action_arm1
+        arm_actions = []
+        for i in range(self.num_arms):
+            lo, hi = self.model.actuator_ctrlrange[1:9, 0], self.model.actuator_ctrlrange[1:9, 1]
+            arm_actions.append(self.ik_policies[i].act().clip(lo, hi))
+            for j in range(self.num_arms):
+                if j != i:
+                    self.ik_policies[j].ignore(self.ik_policies[i].target_object, i)
+        return arm_actions
 
     def _get_reward(self, state, action, info) -> float:
         """
@@ -119,10 +119,10 @@ class TaskEnv(BaseEnv):
     def step(
             self, action: np.ndarray
     ) -> Tuple[np.ndarray, float, bool, bool, Dict[str, Any]]:
-        action_arm0, action_arm1 = self._compose_control(action)
+        arm_actions = self._compose_control(action)
 
         state, terminate, info = self.step_sim(
-            action_arm0=action_arm0, action_arm1=action_arm1
+            **{f"action_arm{i}": arm_actions[i] for i in range(self.num_arms)}
         )
 
         reward = self._get_reward(state, action, info)
@@ -139,8 +139,8 @@ class TaskEnv(BaseEnv):
             options: Optional[Dict[str, Any]] = None,
     ) -> Tuple[np.ndarray, Dict[str, Any]]:
         state, info = self.reset_sim(seed=seed)
-        self.ik_policy0.reset()
-        self.ik_policy1.reset()
+        for ik_policy in self.ik_policies:
+            ik_policy.reset()
         obs = self._process_observation(state)
         self.last_score = info["scores"].copy()
 
@@ -190,8 +190,7 @@ class ProgressRewardEnv(TaskEnv):
         gripper_pos = self.physics.named.data.site_xpos[ik_policy._gripper_site]
 
         candidates = copy.copy(self.task_manager._in_scene)
-        if ik_policy.ignore_object is not None and ik_policy.ignore_object in candidates:
-            candidates.remove(ik_policy.ignore_object)
+        candidates = list(filter(lambda x: x not in ik_policy.ignore_objects.values(), candidates))
 
         if len(candidates) == 0:
             return None, last_dist_gripper_to_closest_cube, 0
@@ -226,7 +225,7 @@ class ProgressRewardEnv(TaskEnv):
 
         # Compute the closest cube for each agent and the distance to the cube
         gripper_cube_reward = 0.0
-        policies = [self.ik_policy0, self.ik_policy1]
+        policies = self.ik_policies
         closest_cubes = []
         for i, policy in enumerate(policies):
             closest_cube, dist_closest_cube, dist_closest_cube_change = self._compute_gripper_to_closest_cube_dist(
@@ -272,10 +271,8 @@ class SingleFullRLProgressRewardEnv(ProgressRewardEnv):
         )
 
     def _compose_control(self, rl_action):
-        _, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = self._process_action(rl_action)
-        action_arm1 = ik_action1
-        return action_arm0, action_arm1
+        ik_actions = super()._compose_control(None)
+        return [self._process_action(rl_action), ik_actions[1]]
 
 
 class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
@@ -289,12 +286,10 @@ class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
         )
 
     def _compose_control(self, rl_action):
-        ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0
-        if self.ik_policy0.state is not PolicyState.IDLE:
-            action_arm0 += 0.5 * self._process_action(rl_action)
-        action_arm1 = ik_action1
-        return action_arm0, action_arm1
+        ik_actions = super()._compose_control(None)
+        if self.ik_policies[0].state is not PolicyState.IDLE:
+            ik_actions[0] += 0.5 * self._process_action(rl_action)
+        return ik_actions
 
 
 class DoubleFullRLProgressRewardEnv(ProgressRewardEnv):
@@ -308,9 +303,7 @@ class DoubleFullRLProgressRewardEnv(ProgressRewardEnv):
         )
 
     def _compose_control(self, rl_action):
-        action_arm0 = self._process_action(rl_action[0:8])
-        action_arm1 = self._process_action(rl_action[8:16])
-        return action_arm0, action_arm1
+        return [self._process_action(rl_action[0:8]), self._process_action(rl_action[8:16])]
 
 
 class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
@@ -324,30 +317,25 @@ class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
         )
 
     def _compose_control(self, rl_action):
-        ik_action0, ik_action1 = super()._compose_control(rl_action)
-        action_arm0 = ik_action0
-        if self.ik_policy0.state is not PolicyState.IDLE:
-            action_arm0 += 0.5 * self._process_action(rl_action[0:8])
-        action_arm1 = ik_action1
-        if self.ik_policy1.state is not PolicyState.IDLE:
-            action_arm1 += 0.5 * self._process_action(rl_action[8:16])
-
-        return action_arm0, action_arm1
+        ik_actions = super()._compose_control(None)
+        if self.ik_policies[0].state is not PolicyState.IDLE:
+            ik_actions[0] += 0.5 * self._process_action(rl_action[0:8])
+        if self.ik_policies[1].state is not PolicyState.IDLE:
+            ik_actions[1] += 0.5 * self._process_action(rl_action[8:16])
+        return ik_actions
 
 
 class IKToggleEnv(TaskEnv):
-    NUM_AGENTS = 2
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        action_dims = self.NUM_AGENTS
+        action_dims = self.num_arms
         self.action_space = spaces.Box(
             low=-np.ones(action_dims),
             high=np.ones(action_dims),
             dtype=np.float32
         )
 
-        obs_dims = 6 * self.dof + 13 * self.max_num_objects + self.dof * self.NUM_AGENTS  # add proposed IK actions
+        obs_dims = 6 * self.dof + 13 * self.max_num_objects + self.dof * self.num_arms  # add proposed IK actions
         self.observation_space = spaces.Box(
             low=-np.inf * np.ones(obs_dims),
             high=np.inf * np.ones(obs_dims),
@@ -356,23 +344,22 @@ class IKToggleEnv(TaskEnv):
 
     def _process_observation(self, state: np.ndarray) -> np.ndarray:
         obs = super()._process_observation(state)
-        self.ik_action0, self.ik_action1 = super()._compose_control(None)
-        obs = np.concatenate([obs, self.ik_action0, self.ik_action1])
+        self.ik_actions = super()._compose_control(None)
+        obs = np.concatenate([obs] + self.ik_actions)
         return obs
 
 
 class PauseIKToggleEnv(IKToggleEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.last_action_arm0 = np.zeros(self.dof)
-        self.last_action_arm1 = np.zeros(self.dof)
+        self.last_arm_actions = [np.zeros(self.dof) for _ in range(self.num_arms)]
 
     def _compose_control(self, rl_action):
-        action_arm0 = self.ik_action0 if rl_action[0] > 0 else self.last_action_arm0
-        action_arm1 = self.ik_action1 if rl_action[1] > 0 else self.last_action_arm1
-        self.last_action_arm0 = action_arm0
-        self.last_action_arm1 = action_arm1
-        return action_arm0, action_arm1
+        arm_actions = [self.ik_actions[i] if rl_action[i] > 0
+                       else self.last_arm_actions[0]
+                       for i in range(self.num_arms)]
+        self.last_arm_actions = arm_actions
+        return arm_actions
 
 
 class BackupIKToggleEnv(IKToggleEnv):
@@ -380,6 +367,7 @@ class BackupIKToggleEnv(IKToggleEnv):
         super().__init__(**kwargs)
 
     def _compose_control(self, rl_action):
-        action_arm0 = self.ik_action0 if rl_action[0] > 0 else self.ik_policy0.default_pose
-        action_arm1 = self.ik_action1 if rl_action[1] > 0 else self.ik_policy1.default_pose
-        return action_arm0, action_arm1
+        arm_actions = [self.ik_actions[i] if rl_action[i] > 0
+                       else self.ik_policies[0].default_pose
+                       for i in range(self.num_arms)]
+        return arm_actions
