@@ -22,11 +22,11 @@ class AdditionalMetricsCallback(BaseCallback):
         try:
             score_history = self.training_env.get_attr("ep_score_history")
             if all(score_history):  # no env has empty history
-                for arm_id in range(self.training_env.get_attr("num_arms")[0]):
-                    arm_scores = [score_history[env_id][-t][arm_id]
+                for bucket_id in range(score_history[0][0]):
+                    arm_scores = [score_history[env_id][-t][bucket_id]
                                   for env_id in range(len(score_history))
                                   for t in range(min(100, len(score_history[env_id])))]
-                    self.logger.record(f"rollout/ep_score_mean_arm{arm_id}", sum(arm_scores) / len(arm_scores))
+                    self.logger.record(f"rollout/ep_score_mean_bucket{bucket_id}", sum(arm_scores) / len(arm_scores))
         except AttributeError:
             raise AssertionError("Property ep_score_history not present in env object", self.training_env)
         return True
