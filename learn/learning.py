@@ -22,7 +22,7 @@ class AdditionalMetricsCallback(BaseCallback):
         try:
             score_history = self.training_env.get_attr("ep_score_history")
             if all(score_history):  # no env has empty history
-                for bucket_id in range(score_history[0][0]):
+                for bucket_id in range(len(score_history[0][0])):
                     arm_scores = [score_history[env_id][-t][bucket_id]
                                   for env_id in range(len(score_history))
                                   for t in range(min(100, len(score_history[env_id])))]
