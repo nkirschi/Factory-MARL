@@ -17,7 +17,7 @@ RESOLUTION = 1024
 
 if __name__ == "__main__":
     if RUN_ID is None:
-        env = environments.TaskEnv(render_mode="human", width=RESOLUTION, height=RESOLUTION, num_arms=2)
+        env = environments.TaskEnv(render_mode="human", width=RESOLUTION, height=RESOLUTION, num_arms=4)
     else:
         api = wandb.Api()
         run = api.run(f"nelorth/adlr/{RUN_ID}")
@@ -43,6 +43,7 @@ if __name__ == "__main__":
                 action, _states = model.predict(obs)
             obs, reward, terminate, truncate, info = env.step(action)
             print(f"IK states: {tuple(env.ik_policies[i].state.name for i in range(env.num_arms))}")
+            print(f"action: {action}")
             print(f"reward: {reward:.4f}")
             if terminate:
                 print(
