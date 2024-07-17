@@ -26,11 +26,12 @@ class BaseEnv(gym.Env):
         initial_conveyor_speed: float = 0.1,  # m/s
         conveyor_acceleration: float = 0.001,  # m/s^2
         pt_time: float = 0.2,  # s
-        force_contact_threshold: float = 100.0,  # threshold for contact forces with arms, above which the episode is terminated
+        force_contact_threshold: float = 200.0,  # threshold for contact forces with arms, above which the episode is terminated
         max_num_objects: int = 10,
         control_frequency: float = 10,  # Hz
         spawn_freq: float = 1 / 5,
         spawn_freq_increase: float = 1.001,
+        num_arms: int = 2,
     ):
 
         self.metadata = {
@@ -45,6 +46,7 @@ class BaseEnv(gym.Env):
         self.height = height
 
         self.max_num_objects = max_num_objects
+        self.num_arms = num_arms
         self.physics = self._initialize_simulation(seed=seed)
 
         self.task_manager = TaskManager(
@@ -80,15 +82,15 @@ class BaseEnv(gym.Env):
 
         self.dof = dof = 8
 
+        arm_states = []
+        for i in range(num_arms):
+            arm_states.append((f"qpos_player{i}", "f4", (dof,)))  # joint positions
+            arm_states.append((f"qvel_player{i}", "f4", (dof,)))  # joint velocities
+            arm_states.append((f"ctrl_player{i}", "f4", (dof,)))  # joint control commands
+
         self.state_dtype = np.dtype(
             [
-                # joint states
-                ("qpos_player0", "f4", (dof,)),  # joint positions for manipulator 0
-                ("qvel_player0", "f4", (dof,)),  # joint velocities for manipulator 0
-                ("ctrl_player0", "f4", (dof,)),  # joint targets for manipulator 0
-                ("qpos_player1", "f4", (dof,)),  # joint positions for manipulator 1
-                ("qvel_player1", "f4", (dof,)),  # joint velocities for manipulator 1
-                ("ctrl_player1", "f4", (dof,)),  # joint targets for manipulator 1
+                *arm_states,  # joint states
                 # object_poses and object_vels are constant-sized arrays that contain the state of the graspable objects in the scene
                 # Only the first 'num_obj' entries contain valid data, the remaining entries are filled with zeros
                 (
@@ -107,16 +109,16 @@ class BaseEnv(gym.Env):
 
         # indexing
         self.actuated_joints = []
-        for i in range(2):
-            j = [f"arm{i}/iiwa14/joint{j}" for j in range(1, 8)] + [
+        for i in range(num_arms):
+            joint = [f"arm{i}/iiwa14/joint{j}" for j in range(1, 8)] + [
                 f"arm{i}/iiwa14/single_gripper/left_plate_slide_joint"
             ]
-            self.actuated_joints.append(j)
+            self.actuated_joints.append(joint)
 
         self.joint_limits = self.physics.model.actuator_ctrlrange[1:9]
 
         self.arm_geoms = []
-        for i in range(2):
+        for i in range(num_arms):
             for j in range(0, 61):
                 self.arm_geoms.append(f"arm{i}/iiwa14//unnamed_geom_{j}")
             for j in range(9):
@@ -145,27 +147,23 @@ class BaseEnv(gym.Env):
 
     def _get_state(self) -> np.ndarray:
 
+        arms_states = []
         # player 1
-        qpos0 = self.physics.named.data.qpos[self.actuated_joints[0]]
-        qvel0 = self.physics.named.data.qvel[self.actuated_joints[0]]
-        ctrl0 = self.ctrl_target[1:9]
-
-        # player 2
-        qpos1 = self.physics.named.data.qpos[self.actuated_joints[1]]
-        qvel1 = self.physics.named.data.qvel[self.actuated_joints[1]]
-        ctrl1 = self.ctrl_target[9:]
+        for i in range(self.num_arms):
+            qpos = self.physics.named.data.qpos[self.actuated_joints[i]]
+            qvel = self.physics.named.data.qvel[self.actuated_joints[i]]
+            ctrl_idx = i * 8
+            ctrl = self.ctrl_target[ 1 + ctrl_idx : ctrl_idx + 9]
+            arms_states.append(qpos)
+            arms_states.append(qvel)
+            arms_states.append(ctrl)
 
         # objects
         object_pose, object_vel, num_obj = self.task_manager.get_valid_object_vectors()
 
         state = np.array(
             (
-                qpos0,
-                qvel0,
-                ctrl0,
-                qpos1,
-                qvel1,
-                ctrl1,
+                *arms_states,
                 object_pose,
                 object_vel,
                 num_obj,
@@ -238,19 +236,22 @@ class BaseEnv(gym.Env):
 
         return force_terminate
 
-    def step_sim(self, action_arm0=None, action_arm1=None) -> Tuple[np.ndarray, bool]:
+    def step_sim(self, **kwargs) -> Tuple[np.ndarray, bool]:
 
-        if action_arm0 is None:
-            action_arm0 = np.zeros(self.dof)
+        action_arm_n = []
 
-        if action_arm1 is None:
-            action_arm1 = np.zeros(self.dof)
+        for i in range(self.num_arms):
+            if f"action_arm{i}" in kwargs:
+                action_arm_n.append(kwargs.get(f"action_arm{i}"))
+            else:
+                action_arm_n.append(np.zeros(self.dof))
+        
+        action_arm_n = np.concatenate(action_arm_n)       
+            
+        assert len(action_arm_n) == (self.num_arms) * self.dof , f"Control dimension mismatch. Expected {self.num_arms}*{self.dof}, found {len(action_arm_n)}"
 
-        assert (
-            len(action_arm0) == len(action_arm1) == self.dof
-        ), f"Control dimension mismatch. Expected {self.dof}, found {len(action_arm0)} and {len(action_arm1)}"
 
-        ctrl = np.concatenate([self.conveyor_speed, action_arm0, action_arm1])
+        ctrl = np.concatenate([self.conveyor_speed, action_arm_n])
 
         # clip action
         ctrl = np.clip(
@@ -295,9 +296,10 @@ class BaseEnv(gym.Env):
         seed=None,
     ) -> mjcf.Physics:
 
-        mjcf_model = build_scene(num_objects=self.max_num_objects, seed=seed)
+        mjcf_model = build_scene(num_objects=self.max_num_objects, seed=seed, num_arms=self.num_arms)
         self.mjcf_model = mjcf_model
         physics = mjcf.Physics.from_mjcf_model(mjcf_model)
         physics.model._model.vis.global_.offwidth = self.width
         physics.model._model.vis.global_.offheight = self.height
+
         return physics

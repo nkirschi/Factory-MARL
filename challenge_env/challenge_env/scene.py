@@ -24,14 +24,14 @@ class PickableObject:
 
 
 class Table:
-    def __init__(self):
+    def __init__(self, length = 1.0):
         self.mjcf_model = mjcf.RootElement(model="table")
         self.body = self.mjcf_model.worldbody.add(
             "geom",
             name="table",
             type="box",
             pos=[0.0, 0.0, 0.5],
-            size=[1.2, 1, 0.5],
+            size=[1.2, length, 0.5],
             solimp=[0.98, 0.9999, 0.001],
             solref=[0.002, 1],
             priority=1,
@@ -39,11 +39,14 @@ class Table:
 
 
 class Arm:
-    def __init__(self, pos, name, flip=False):
+    def __init__(self, pos, name, flip=False, mount_ceiling=False):
         self.mjcf_model = mjcf.RootElement(model=name)
         euler = [0, 0, 0]
         if flip:
             euler = [0, 0, np.pi]
+        if mount_ceiling:
+            euler[1] = np.pi
+            pos[2] = 2.4
 
         self.site = self.mjcf_model.worldbody.add(
             "site",
@@ -103,12 +106,12 @@ class Bucket:
             frame.attach(BucketFence(size).mjcf_model)
 
 
-def build_scene(num_objects=10, randomize_objects=True, seed=None):
+def build_scene(num_objects=10, randomize_objects=True, seed=None, num_arms=2):
 
     mjcf_model = mjcf.from_path(DIR + "/scene.xml")
 
     # table
-    table = Table()
+    table = Table(length = 1 + 0.5 * ((num_arms-2)/2.0))
     mjcf_model.attach(table.mjcf_model)
 
     # conveyor belt
@@ -142,12 +145,26 @@ def build_scene(num_objects=10, randomize_objects=True, seed=None):
     mjcf_model.attach(bucket1.mjcf_model)
 
     # arms
-    dist_x = 0.6
-    arm1 = Arm([dist_x, 0, 1.0], name="arm0")
-    mjcf_model.attach(arm1.mjcf_model)
 
-    arm2 = Arm([-dist_x, 0, 1.0], name="arm1", flip=True)
-    mjcf_model.attach(arm2.mjcf_model)
+    assert num_arms % 2 == 0 and num_arms >=2
+    dist_x = 0.6
+    dist_y = 1.2
+    arms = []
+    for i in range(num_arms):
+        x_pos = dist_x * (-1)**i
+        y_pos = dist_y * (i // 2)
+        if i in [4, 5]:
+            y_pos = 0.5 * dist_y * ((i - 2) // 2)
+            x_pos*=0.9
+        z_pos = 1.0
+        arm = Arm([x_pos, y_pos, z_pos], name=f"arm{i}", flip=i % 2 == 1)
+        mjcf_model.attach(arm.mjcf_model)
+        arms.append(arm)
+    # arm1 = Arm([dist_x, 0, 1.0], name="arm0")
+    # mjcf_model.attach(arm1.mjcf_model)
+
+    # arm2 = Arm([-dist_x, 0, 1.0], name="arm1", flip=True)
+    # mjcf_model.attach(arm2.mjcf_model)
 
     return mjcf_model
 
@@ -164,8 +181,8 @@ if __name__ == "__main__":
     import time
     import mujoco
 
-    mjcf_model = build_scene()
-    print(mjcf_model.to_xml_string())
+    mjcf_model = build_scene(num_arms = 6)
+    # print(mjcf_model.to_xml_string())
     # physics = mjcf.Physics.from_xml_string(mjcf_model.to_xml_string(), assets=mjcf_model.get_assets())
     physics = mjcf.Physics.from_mjcf_model(mjcf_model)
 

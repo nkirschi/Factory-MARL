@@ -86,7 +86,7 @@ class TaskManager:
         y_bound = 1.2
         z_bound = 0.9
         oox = np.abs(qpos[:, 0]) > x_bound
-        ooy = np.abs(qpos[:, 1]) > y_bound
+        ooy = qpos[:, 1] < -y_bound
         ooz = qpos[:, 2] < z_bound
         out_of_scene = oox | ooy | ooz
         for obj_idx in sorted(np.where(out_of_scene)[0], reverse=True):
