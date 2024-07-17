@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20240705104135" modified="D:20240715162351" tex="xetex"/>
+<info created="D:20240705104135" modified="D:20240717134013" tex="xetex"/>
 <preamble>\usepackage{graphicx}
 \usepackage{forest}
 \usepackage{tcolorbox}
@@ -147,7 +147,7 @@ right=6pt,
 	\ifx#1\mathop\expandafter\displaylimits\fi}
 \makeatother
 
-\setlist[itemize]{noitemsep,topsep=0pt}
+\setlist[itemize]{noitemsep,topsep=0pt, leftmargin=*}
 
 \newcommand{\cupdot}{\charfusion[\mathbin]{\cup}{\cdot}}
 \newcommand{\bigcupdot}{\charfusion[\mathop]{\bigcup}{\cdot}}</preamble>
@@ -3749,55 +3749,38 @@ h
 <text layer="alpha" matrix="1 0 0 1 614.919 16" transformations="translations" pos="144 512" stroke="black" type="minipage" width="160" height="29.398" depth="24.46" valign="top">\includegraphics[height=1.9cm]{TUM_Logo}</text>
 <text matrix="1 0 0 1 -240.611 -148.649" transformations="translations" pos="256 672" stroke="tumblue" type="minipage" width="736" height="15.1646" depth="9.702" valign="top" size="Huge">\bfseries Cooperative Multi-agent RL for Factory Manipulation</text>
 <text matrix="1 0 0 1 -0.611 -130.707" transformations="translations" pos="16 624" stroke="black" type="minipage" width="736" height="9.539" depth="4.56" valign="top" size="LARGE">Nikolas Kirschstein, Kassian Köck</text>
-<text matrix="0.947368 0 0 0.713726 0.842 -219.728" transformations="translations" pos="16 496" stroke="black" type="minipage" width="288" height="75.412" depth="70.59" valign="top">\begin{tcolorbox}[adjusted title=Reward Adaption, colframe=tumblue]
+<text matrix="0.947368 0 0 0.713726 304.842 -35.6128" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="67.681" depth="62.85" valign="top">\begin{tcolorbox}[adjusted title=Continuous Control: Reward Shaping, colframe=UPgray]
 
-Problem: Learning very hard due to screte, highly sparse reward 
-$\rightarrow$ more diverse reward function needed
-
-Desirable Incentives:
 \begin{itemize}
-\item $I_0$: Reward new cubes put into bucket
-\item $I_1$: Reward approach of gripper to closest cube
-\item $I_2$: Reward approach of closest cube to bucket
+\item Problem: learning hard due to discrete, highly sparse reward\\
+$\rightarrow$ denser reward function needed
+
+\item Desirable Incentives:
+\begin{itemize}
+\item[] $I_0$: Reward new cubes put into bucket
+\item[] $I_1$: Reward approach of gripper to closest cube
+\item[] $I_2$: Reward approach of closest cube to bucket
 \end{itemize}
 \vspace*{-.0em}
-Reward function:
-\vspace*{-2.1em}
-\begin{align*}
-r = \kappa + \displaystyle\sum_{i=0}^2 \omega_i I_i
-\end{align*}
+\item Reward function: $r = r_0 + \omega_0 I_0 + \omega_1 I_1 + \omega_2 I_2$\\
+(base reward $r_0$ prevents learning to terminate episode)
 
-\vspace*{-1.1em}
-Base rew. $\kappa$ prevents RL agent from learning to terminate episode
-
-
-\end{tcolorbox}</text>
-<text matrix="0.947368 0 0 0.713726 1.142 -26.157" transformations="translations" pos="16 496" stroke="black" type="minipage" width="288" height="93.973" depth="89.2" valign="top">\begin{tcolorbox}[adjusted title=The Environment,colframe=UPorange]
-Goal: Multiple robot arms cooperating to maximise efficiency in factory manipulation task
-
-\vspace*{.1em}
-Gym env based on MuJoCo (Howell et al. 2022)
-
-\vspace*{-.3em}
-\begin{itemize}
-\item 2 or more robot arms (8 DOF each)
-\item basket in reach for each arm
-\item conveyor belt with increasing speed transporting cubes
-\item score = number cubes in baskets
 \end{itemize}
 
-\vspace*{-.3em}
-Episode ends, if \dots
-\vspace*{-.2em}
+\end{tcolorbox}</text>
+<text matrix="0.947368 0 0 0.713726 1.142 -138.157" transformations="translations" pos="16 496" stroke="black" type="minipage" width="288" height="61.765" depth="56.92" valign="top">\begin{tcolorbox}[adjusted title=Given: The Environment,colframe=tumblue]
+
+\begin{itemize}
+\item even number of robot arms (8 DOF each)
+\item basket in reach for each arm
+\item conveyor belt with increasing speed transporting cubes
+\item score = number of cubes in baskets
+\item episode termination if either:
 \begin{itemize}
 \item arm hits the env (incl. other arms)
 \item cube is missed by all arms
 \end{itemize}
-\vspace*{-.2em}
-
-$\rightarrow$ Conventional pre-programming-based approaches too inflexible and tedious
-
-$\rightarrow$ Use of MARL
+\end{itemize}
 \end{tcolorbox}
 
 </text>
@@ -3806,7 +3789,104 @@ Technical \\
 University of \\
 Munich
 \end{tabular}</text>
-<image matrix="0.136443 0 0 0.136443 16.3163 332.649" rect="0 0 1024 1024" bitmap="1"/>
-<image matrix="0.136443 0 0 0.136443 164.016 332.649" rect="0 0 1024 1024" bitmap="1"/>
+<image matrix="0.129861 0 0 0.131002 16.3163 322.221" rect="0 0 1024 1024" bitmap="1"/>
+<image matrix="0.132736 0 0 0.130974 164.016 322.249" rect="0 0 1024 1024" bitmap="1"/>
+<text matrix="0.947368 0 0 0.713726 624.842 -203.728" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="30.619" depth="25.69" valign="top">\begin{tcolorbox}[adjusted title=Key Insights and Challenges, colframe=orange]
+\begin{itemize}
+\item Dodging is easy, scoring is hard
+\item 
+\end{itemize}
+\end{tcolorbox}</text>
+<text matrix="0.947368 0 0 0.713726 624.842 -267.728" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="31.641" depth="26.72" valign="top">\begin{tcolorbox}[adjusted title=Future Work, colframe=orange]
+\begin{itemize}
+\item Throw more computational resources at the problem
+\item other setting: discrete control spits out ID of cube to grab
+\end{itemize}
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0 -32" transformations="translations" pos="320 480" stroke="black" type="minipage" width="304" height="61.993" depth="57.14" valign="top">
+
+\begin{tcolorbox}[adjusted title= Continuous Control: Setting, colframe=UPgray]
+\textbf{action space:}
+ \([-1,1]\) per joint and learnt arm to control joint state
+
+\textbf{observation space:} joint and cube states\\
+
+learning choices per arm:
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item \textbf{full RL:} learn entire joint control RL from scratch (hard)
+\item \textbf{delta:} learn only deviation from IK base policy (simplication)
+\item \textbf{base}: execute IK base policy (baseline)
+\end{itemize}
+
+
+\end{tcolorbox}</text>
+<text transformations="translations" pos="640 448" stroke="black" type="minipage" width="304" height="55.74" depth="50.88" valign="top">\begin{tcolorbox}[adjusted title= Discrete Control: Setting, colframe=UPgray150]
+\textbf{action space:} \(\{\textsc{on}, \textsc{off}\}\) per arm to toggle use of IK base policy
+
+\textbf{observation space:} joint and cube states \textbf{+ proposed IK control}\\ 
+
+behaviour choices for case \textsc{off}:
+\begin{itemize}
+\item \textbf{pause:} freeze at the current position
+\item \textbf{backup:} return to a safe default position
+\end{itemize}
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0 -80" transformations="translations" pos="320 256" stroke="black" type="minipage" width="304" height="50.549" depth="45.67" valign="top">\begin{tcolorbox}[adjusted title= Continuous Control: Results, colframe=UPgray]
+
+
+plot arm scores + ep len
+
+
+\begin{itemize}
+\item no learning with original sparse score-based reward \\ 
+\(\Rightarrow\)	 progress-based reward with params \(\alpha = ,\beta =\)	
+\item successfully learns collision avoidance
+\item BUT: no gripping at all
+\end{itemize}
+
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0 32" transformations="translations" pos="640 304" stroke="black" type="minipage" width="304" height="43.611" depth="38.71" valign="top">\begin{tcolorbox}[adjusted title= Discrete Control: Results, colframe=UPgray150]
+
+
+plot arm scores + ep len
+
+\begin{itemize}
+\item true sparse score-based reward suffices
+\item successful gripping
+\item 2nd arm often too hesistant
+\end{itemize}
+
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 320 -16" transformations="translations" pos="320 256" stroke="black" type="minipage" width="304" height="37.884" depth="32.98" valign="top">\begin{tcolorbox}[adjusted title=RL Specifica, colframe=tumblue]
+
+\begin{itemize}
+\item discount factor: $0.99$ (searched $0.95$ to $0.999$)
+\item algorithm: PPO for $5\mathrm{M}$ time steps
+\item policy network: MLP with two hidden layers of width $128$
+\end{itemize}
+
+\end{tcolorbox}</text>
+<text matrix="0.947368 0 0 0.713726 1.142 -42.157" transformations="translations" pos="16 496" stroke="black" type="minipage" width="288" height="43.641" depth="38.74" valign="top">\begin{tcolorbox}[adjusted title=Big Picture,colframe=UPorange]
+\textbf{goal:} multiple robot arms cooperating to maximise efficiency in factory manipulation task
+\begin{itemize}
+\item conventional pre-programming too inflexible and tedious
+\item multi-agent RL allows to learn near-optimal behaviour
+
+\end{itemize}
+\end{tcolorbox}
+
+</text>
+<text matrix="1 0 0 1 -304 -400" transformations="translations" pos="320 480" stroke="black" type="minipage" width="288" height="36.643" depth="31.73" valign="top">
+
+\begin{tcolorbox}[adjusted title= Given: IK Base Policy, colframe=tumblue]
+
+\begin{itemize}
+\item state machine working on one target object at a time
+\item different base policies ignore each others&apos; target objects
+\item control calculated via inverse kinematics
+\end{itemize}
+
+\end{tcolorbox}</text>
 </page>
 </ipe>
