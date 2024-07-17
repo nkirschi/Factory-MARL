@@ -23,7 +23,7 @@ class TaskEnv(BaseEnv):
 
         self.ik_policies = [IKPolicy(self, arm_id=i, bucket_idx=i % 2) for i in range(self.num_arms)]
 
-        obs_dims = 6 * self.dof + 13 * self.max_num_objects
+        obs_dims = self.num_arms * 3 * self.dof + 13 * self.max_num_objects
         self.observation_space = spaces.Box(
             low=-np.inf * np.ones(obs_dims),
             high=np.inf * np.ones(obs_dims),
@@ -331,7 +331,7 @@ class IKToggleEnv(TaskEnv):
 
         self.action_space = spaces.MultiDiscrete(self.num_arms * [2])
 
-        obs_dims = 6 * self.dof + 13 * self.max_num_objects + self.dof * self.num_arms  # add proposed IK actions
+        obs_dims = self.num_arms * 3 * self.dof + 13 * self.max_num_objects + self.dof * self.num_arms  # add proposed IK actions
         self.observation_space = spaces.Box(
             low=-np.inf * np.ones(obs_dims),
             high=np.inf * np.ones(obs_dims),
