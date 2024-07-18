@@ -155,8 +155,6 @@ class ProgressRewardEnv(TaskEnv):
     Adds a base reward to the reward function to prevent large negative rewards that can cause early termination.
     """
 
-    NUM_AGENTS = 2  # Number of arms in the environment, currently we assume it equals number of buckets
-
     def __init__(
             self,
             gripper_to_closest_cube_reward_factor,
@@ -174,8 +172,8 @@ class ProgressRewardEnv(TaskEnv):
         self.gripper_to_closest_cube_reward_factor = gripper_to_closest_cube_reward_factor
         self.closest_cube_to_bucket_reward_factor = closest_cube_to_bucket_reward_factor
         self.small_action_norm_reward_factor = small_action_norm_reward_factor
-        self.last_gripper_to_closest_cube_dist = [0] * self.NUM_AGENTS
-        self.last_bucket_to_closest_cube_dist = [0] * self.NUM_AGENTS
+        self.last_gripper_to_closest_cube_dist = [0] * self.num_arms
+        self.last_bucket_to_closest_cube_dist = [0] * self.num_arms
         self.base_reward = base_reward
 
     def _compute_gripper_to_closest_cube_dist(self, ik_policy, last_dist_gripper_to_closest_cube):
@@ -240,7 +238,7 @@ class ProgressRewardEnv(TaskEnv):
         bucket_positions = [self.physics.bind(b).xpos for b in self.task_manager.buckets]
         for i, _ in enumerate(closest_cubes):
             dist_bucket, dist_bucket_change = self._compute_bucket_to_closest_cube_dist(
-                closest_cubes[i], bucket_positions[i], self.last_bucket_to_closest_cube_dist[i]
+                closest_cubes[i], bucket_positions[i % 2], self.last_bucket_to_closest_cube_dist[i]
             )
             self.last_bucket_to_closest_cube_dist[i] = dist_bucket
             bucket_cube_reward += dist_bucket_change
