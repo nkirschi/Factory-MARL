@@ -19,6 +19,7 @@ if __name__ == "__main__":
     if RUN_ID is None:
         env = environments.TaskEnv(render_mode="human", width=RESOLUTION, height=RESOLUTION, num_arms=4)
     else:
+        wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
         api = wandb.Api()
         run = api.run(f"nelorth/adlr/{RUN_ID}")
         chkpt_timestep = int(CHECKPOINT * int(run.config['total_timesteps']))
