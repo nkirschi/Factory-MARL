@@ -270,7 +270,7 @@ class SingleFullRLProgressRewardEnv(ProgressRewardEnv):
 
     def _compose_control(self, rl_action):
         ik_actions = super()._compose_control(None)
-        return [self._process_action(rl_action), ik_actions[1]]
+        return [self._process_action(rl_action)] + ik_actions[1:]
 
 
 class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
@@ -290,10 +290,10 @@ class SingleDeltaProgressRewardEnv(ProgressRewardEnv):
         return ik_actions
 
 
-class DoubleFullRLProgressRewardEnv(ProgressRewardEnv):
+class AllFullRLProgressRewardEnv(ProgressRewardEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        action_dims = 2 * self.dof
+        action_dims = self.num_arms * self.dof
         self.action_space = spaces.Box(
             low=-np.ones(action_dims),
             high=np.ones(action_dims),
@@ -301,13 +301,13 @@ class DoubleFullRLProgressRewardEnv(ProgressRewardEnv):
         )
 
     def _compose_control(self, rl_action):
-        return [self._process_action(rl_action[0:8]), self._process_action(rl_action[8:16])]
+        return [self._process_action(rl_action[self.dof*i:self.dof*(i+1)]) for i in range(self.num_arms)]
 
 
-class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
+class AllDeltaProgressRewardEnv(ProgressRewardEnv):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        action_dims = 2 * self.dof
+        action_dims = self.num_arms * self.dof
         self.action_space = spaces.Box(
             low=-np.ones(action_dims),
             high=np.ones(action_dims),
@@ -316,10 +316,9 @@ class DoubleDeltaProgressRewardEnv(ProgressRewardEnv):
 
     def _compose_control(self, rl_action):
         ik_actions = super()._compose_control(None)
-        if self.ik_policies[0].state is not PolicyState.IDLE:
-            ik_actions[0] += 0.5 * self._process_action(rl_action[0:8])
-        if self.ik_policies[1].state is not PolicyState.IDLE:
-            ik_actions[1] += 0.5 * self._process_action(rl_action[8:16])
+        for i in range(self.num_arms):
+            if self.ik_policies[i].state is not PolicyState.IDLE:
+                ik_actions[i] += 0.5 * self._process_action(rl_action[self.dof*i:self.dof*(i+1)])
         return ik_actions
 
 
