@@ -1,0 +1,681 @@
+<?xml version="1.0"?>
+<!DOCTYPE ipe SYSTEM "ipe.dtd">
+<ipe version="70218" creator="Ipe 7.2.29">
+<info created="D:20240705104135" modified="D:20240721201537" tex="xetex"/>
+<preamble>\usepackage{graphicx}
+\usepackage{forest}
+\usepackage{tcolorbox}
+\usepackage{fontspec}
+\usepackage{amsfonts, amssymb, mathtools, bm}
+\usepackage{siunitx}
+\usepackage[shortlabels]{enumitem}
+\usepackage{caption}
+\usepackage{booktabs} 
+\usepackage{multirow}
+\usepackage[symbol]{footmisc}
+\usepackage{ulem}
+
+
+%\setsansfont{DejaVu Sans}
+\renewcommand{\familydefault}{\sfdefault}
+
+\setlength{\ULdepth}{2.5pt}
+
+\definecolor{oxblue}{HTML}{002147}
+\definecolor{tumblue}{HTML}{2C71B5}
+\tcbset{
+colback=white,
+colframe=oxblue, 
+fonttitle=\bfseries,
+left=6pt,
+right=6pt,
+}
+\sisetup{reset-math-version = false}
+
+
+% custom commands
+
+% general
+\newcommand{\mat}[1]{\mathbf{#1}}
+\newcommand{\vect}[1]{\bm{#1}}
+\newcommand{\diff}{\mathrm{d}}
+\newcommand{\C}{\mathbb{C}}
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\Z}{\mathbb{Z}}
+\DeclareMathOperator{\score}{\varrho}
+
+% graph-related
+\newcommand{\graph}{\mathcal{G}}
+\newcommand{\vertices}{\mathcal{V}}
+\newcommand{\edges}{\mathcal{E}}
+\newcommand{\predecessors}{\vertices_{\mathrm{in}}}
+\newcommand{\successors}{\vertices_{\mathrm{out}}}
+\newcommand{\featMat}{\mat{X}}
+\newcommand{\featVec}{\vect{x}}
+\newcommand{\trueVecSymb}{y}
+\newcommand{\trueVec}{\vect{\trueVecSymb}}
+\newcommand{\predVecSymb}{\hat{\trueVecSymb}}
+\newcommand{\predVec}{\vect{\predVecSymb}}
+\newcommand{\qMatSymb}{Q}
+\newcommand{\qMat}{\mat{\qMatSymb}}
+\newcommand{\qVec}{\bm{q}}
+\newcommand{\adjMatSymb}{A}
+\newcommand{\adjMat}{\mat{\adjMatSymb}}
+\newcommand{\adjMatHat}{\mat{\hat{\adjMatSymb}}}
+\newcommand{\adjMatNormSymb}{\bar{\adjMatSymb}}
+\newcommand{\adjMatNorm}{\mat{\adjMatNormSymb}}
+\newcommand{\dIn}{\mathrm{in}}
+\newcommand{\dOut}{\mathrm{out}}
+\newcommand{\degMatSymb}{D}
+\newcommand{\degMat}{\mat{\degMatSymb}}
+\newcommand{\degMatHat}{\mat{\hat{\degMatSymb}}}
+\newcommand{\incMatSymb}{\nabla}
+\newcommand{\incMat}{\bm{\incMatSymb}}
+\newcommand{\lapMatSymb}{\Delta}
+\newcommand{\lapMat}{\mat{\lapMatSymb}}
+\newcommand{\permMatSymb}{P_\pi}
+\newcommand{\permMat}{\mat{\permMatSymb}}
+
+% NLA-related
+\DeclarePairedDelimiter{\abs}{\lvert}{\rvert}
+\DeclarePairedDelimiter{\norm}{\lVert}{\rVert}
+\DeclareMathOperator{\trace}{tr}
+\DeclareMathOperator{\diag}{diag}
+\newcommand{\idMat}{\mathbf{I}}
+\newcommand{\eigVecMat}{\mat{U}}
+\newcommand{\eigValMat}{\mat{\Lambda}}
+\newcommand{\zeroMat}{\mat{0}}
+\newcommand{\extMixMatSymb}{\Omega}
+\newcommand{\extMixMat}{\mat{\extMixMatSymb}}
+\newcommand{\intMixMatSymb}{\Theta}
+\newcommand{\intMixMat}{\mat{\intMixMatSymb}}
+\newcommand{\choleskyMatSymb}{\Theta}
+\newcommand{\choleskyMat}{\mathbf{\Theta}}
+\newcommand{\sym}[1]{{#1}^{\operatorname{sym}}}
+
+% GCN-related
+\newcommand{\act}{\sigma}
+\newcommand{\params}{\theta}
+\newcommand{\Params}{\bm{\Theta}}
+\DeclareMathOperator{\ReLU}{ReLU}
+\DeclareMathOperator{\GCNConv}{GCNLayer}
+\DeclareMathOperator{\ResGCNConv}{ResGCNLayer}
+\DeclareMathOperator{\GCNIIConv}{GCNIILayer}
+\DeclareMathOperator{\ResGATLayer}{ResGATLayer}
+\newcommand{\rhs}{\operatorname{GNNLayer}_\params}
+\newcommand{\gnnlayer}{\operatorname{GNNLayer}}
+\newcommand{\encoder}{\operatorname{Encoder}}
+\newcommand{\decoder}{\operatorname{Decoder}}
+\newcommand{\energy}{\mathsf{E}}
+\newcommand{\dirEnergy}{\energy_{\text{\scshape dir}}}
+\newcommand{\paramEnergy}{\energy_{\theta}}
+\newcommand{\step}{\tau}
+
+% statistics
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\Var}{\operatorname{Var}}
+\newcommand{\meanVec}{\bm{\mu}}
+\newcommand{\stdVec}{\bm{\sigma}}
+
+% metrics
+\DeclareMathOperator{\mse}{MSE}
+\DeclareMathOperator{\nse}{NSE}
+
+\newcommand{\cell}[2]{\begin{tabular}[x]{@{}r@{}}#1\\\textcolor{darkgray}{\tiny $\pm$#2}\end{tabular}}
+    \newcommand{\error}[2]{\cell{\qty{#1}{}}{\qty{#2}{}}}
+    \newcommand{\nash}[2]{\cell{\footnotesize\qty{#1}{\percent}}{\qty{#2}{\percent}}}
+
+\renewcommand\ttdefault{cmvtt}
+
+\DeclareFontFamily{U}{matha}{\hyphenchar\font45}
+\DeclareFontShape{U}{matha}{m}{n}{
+	&lt;5&gt; &lt;6&gt; &lt;7&gt; &lt;8&gt; &lt;9&gt; &lt;10&gt; gen * matha
+	&lt;10.95&gt; matha10 &lt;12&gt; &lt;14.4&gt; &lt;17.28&gt; &lt;20.74&gt; &lt;24.88&gt; matha12
+}{}
+\DeclareSymbolFont{matha}{U}{matha}{m}{n}
+\DeclareMathSymbol{\odiv}         {2}{matha}{&quot;63}
+
+\makeatletter
+\def\moverlay{\mathpalette\mov@rlay}
+\def\mov@rlay#1#2{\leavevmode\vtop{%
+		\baselineskip\z@skip \lineskiplimit-\maxdimen
+		\ialign{\hfil$\m@th#1##$\hfil\cr#2\crcr}}}
+\newcommand{\charfusion}[3][\mathord]{
+	#1{\ifx#1\mathop\vphantom{#2}\fi
+		\mathpalette\mov@rlay{#2\cr#3}
+	}
+	\ifx#1\mathop\expandafter\displaylimits\fi}
+\makeatother
+
+\setlist[itemize]{noitemsep,topsep=0pt, leftmargin=*}
+
+\newcommand{\cupdot}{\charfusion[\mathbin]{\cup}{\cdot}}
+\newcommand{\bigcupdot}{\charfusion[\mathop]{\bigcup}{\cdot}}</preamble>
+<ipestyle name="basic">
+<symbol name="arrow/arc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/farc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/ptarc(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/fptarc(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="mark/circle(sx)" transformations="translations">
+<path fill="sym-stroke">
+0.6 0 0 0.6 0 0 e
+0.4 0 0 0.4 0 0 e
+</path>
+</symbol>
+<symbol name="mark/disk(sx)" transformations="translations">
+<path fill="sym-stroke">
+0.6 0 0 0.6 0 0 e
+</path>
+</symbol>
+<symbol name="mark/fdisk(sfx)" transformations="translations">
+<group>
+<path fill="sym-fill">
+0.5 0 0 0.5 0 0 e
+</path>
+<path fill="sym-stroke" fillrule="eofill">
+0.6 0 0 0.6 0 0 e
+0.4 0 0 0.4 0 0 e
+</path>
+</group>
+</symbol>
+<symbol name="mark/box(sx)" transformations="translations">
+<path fill="sym-stroke" fillrule="eofill">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+-0.4 -0.4 m
+0.4 -0.4 l
+0.4 0.4 l
+-0.4 0.4 l
+h
+</path>
+</symbol>
+<symbol name="mark/square(sx)" transformations="translations">
+<path fill="sym-stroke">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+</path>
+</symbol>
+<symbol name="mark/fsquare(sfx)" transformations="translations">
+<group>
+<path fill="sym-fill">
+-0.5 -0.5 m
+0.5 -0.5 l
+0.5 0.5 l
+-0.5 0.5 l
+h
+</path>
+<path fill="sym-stroke" fillrule="eofill">
+-0.6 -0.6 m
+0.6 -0.6 l
+0.6 0.6 l
+-0.6 0.6 l
+h
+-0.4 -0.4 m
+0.4 -0.4 l
+0.4 0.4 l
+-0.4 0.4 l
+h
+</path>
+</group>
+</symbol>
+<symbol name="mark/cross(sx)" transformations="translations">
+<group>
+<path fill="sym-stroke">
+-0.43 -0.57 m
+0.57 0.43 l
+0.43 0.57 l
+-0.57 -0.43 l
+h
+</path>
+<path fill="sym-stroke">
+-0.43 0.57 m
+0.57 -0.43 l
+0.43 -0.57 l
+-0.57 0.43 l
+h
+</path>
+</group>
+</symbol>
+<symbol name="arrow/fnormal(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/pointed(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/fpointed(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-0.8 0 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/linear(spx)">
+<path stroke="sym-stroke" pen="sym-pen">
+-1 0.333 m
+0 0 l
+-1 -0.333 l
+</path>
+</symbol>
+<symbol name="arrow/fdouble(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+-1 0 m
+-2 0.333 l
+-2 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/double(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+-1 0 m
+-2 0.333 l
+-2 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-normal(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-fnormal(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-pointed(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.3 0 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-fpointed(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+0.5 0 m
+-0.5 0.333 l
+-0.3 0 l
+-0.5 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-double(spx)">
+<path stroke="sym-stroke" fill="sym-stroke" pen="sym-pen">
+1 0 m
+0 0.333 l
+0 -0.333 l
+h
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<symbol name="arrow/mid-fdouble(spx)">
+<path stroke="sym-stroke" fill="white" pen="sym-pen">
+1 0 m
+0 0.333 l
+0 -0.333 l
+h
+0 0 m
+-1 0.333 l
+-1 -0.333 l
+h
+</path>
+</symbol>
+<anglesize name="22.5 deg" value="22.5"/>
+<anglesize name="30 deg" value="30"/>
+<anglesize name="45 deg" value="45"/>
+<anglesize name="60 deg" value="60"/>
+<anglesize name="90 deg" value="90"/>
+<arrowsize name="large" value="10"/>
+<arrowsize name="small" value="5"/>
+<arrowsize name="tiny" value="3"/>
+<color name="blue" value="0 0 1"/>
+<color name="brown" value="0.647 0.165 0.165"/>
+<color name="darkblue" value="0 0 0.545"/>
+<color name="darkcyan" value="0 0.545 0.545"/>
+<color name="darkgray" value="0.663"/>
+<color name="darkgreen" value="0 0.392 0"/>
+<color name="darkmagenta" value="0.545 0 0.545"/>
+<color name="darkorange" value="1 0.549 0"/>
+<color name="darkred" value="0.545 0 0"/>
+<color name="gold" value="1 0.843 0"/>
+<color name="gray" value="0.745"/>
+<color name="green" value="0 1 0"/>
+<color name="lightblue" value="0.678 0.847 0.902"/>
+<color name="lightcyan" value="0.878 1 1"/>
+<color name="lightgray" value="0.827"/>
+<color name="lightgreen" value="0.565 0.933 0.565"/>
+<color name="lightyellow" value="1 1 0.878"/>
+<color name="navy" value="0 0 0.502"/>
+<color name="orange" value="1 0.647 0"/>
+<color name="pink" value="1 0.753 0.796"/>
+<color name="purple" value="0.627 0.125 0.941"/>
+<color name="red" value="1 0 0"/>
+<color name="seagreen" value="0.18 0.545 0.341"/>
+<color name="turquoise" value="0.251 0.878 0.816"/>
+<color name="violet" value="0.933 0.51 0.933"/>
+<color name="yellow" value="1 1 0"/>
+<dashstyle name="dash dot dotted" value="[4 2 1 2 1 2] 0"/>
+<dashstyle name="dash dotted" value="[4 2 1 2] 0"/>
+<dashstyle name="dashed" value="[4] 0"/>
+<dashstyle name="dotted" value="[1 3] 0"/>
+<gridsize name="10 pts (~3.5 mm)" value="10"/>
+<gridsize name="14 pts (~5 mm)" value="14"/>
+<gridsize name="16 pts (~6 mm)" value="16"/>
+<gridsize name="20 pts (~7 mm)" value="20"/>
+<gridsize name="28 pts (~10 mm)" value="28"/>
+<gridsize name="32 pts (~12 mm)" value="32"/>
+<gridsize name="4 pts" value="4"/>
+<gridsize name="56 pts (~20 mm)" value="56"/>
+<gridsize name="8 pts (~3 mm)" value="8"/>
+<opacity name="10%" value="0.1"/>
+<opacity name="30%" value="0.3"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="75%" value="0.75"/>
+<pen name="fat" value="1.2"/>
+<pen name="heavier" value="0.8"/>
+<pen name="ultrafat" value="2"/>
+<symbolsize name="large" value="5"/>
+<symbolsize name="small" value="2"/>
+<symbolsize name="tiny" value="1.1"/>
+<textsize name="Huge" value="\Huge"/>
+<textsize name="LARGE" value="\LARGE"/>
+<textsize name="Large" value="\Large"/>
+<textsize name="footnote" value="\footnotesize"/>
+<textsize name="huge" value="\huge"/>
+<textsize name="large" value="\large"/>
+<textsize name="script" value="\scriptsize"/>
+<textsize name="small" value="\small"/>
+<textsize name="tiny" value="\tiny"/>
+<textstyle name="center" begin="\begin{center}" end="\end{center}"/>
+<textstyle name="item" begin="\begin{itemize}\item{}" end="\end{itemize}"/>
+<textstyle name="itemize" begin="\begin{itemize}" end="\end{itemize}"/>
+<tiling name="falling" angle="-60" step="4" width="1"/>
+<tiling name="rising" angle="30" step="4" width="1"/>
+</ipestyle>
+<ipestyle name="posterstyle">
+<color name="UPblue" value="0.012 0.125 0.286"/>
+<color name="UPblue10" value="0.863 0.912 0.949"/>
+<color name="UPblue20" value="0.802 0.825 0.857"/>
+<color name="UPblue50" value="0.506 0.562 0.643"/>
+<color name="UPblue70" value="0 0.388 0.5"/>
+<color name="UPdarkred" value="0.737 0.165 0.2"/>
+<color name="UPdarkred20" value="0.925 0.769 0.78"/>
+<color name="UPdarkred50" value="0.855 0.541 0.561"/>
+<color name="UPdarkred70" value="0.808 0.392 0.416"/>
+<color name="UPgray" value="0.6 0.624 0.62"/>
+<color name="UPgray10" value="0.95"/>
+<color name="UPgray120" value="0.494 0.514 0.51"/>
+<color name="UPgray150" value="0.384 0.4 0.396"/>
+<color name="UPgray20" value="0.89 0.894 0.894"/>
+<color name="UPgray50" value="0.78 0.792 0.792"/>
+<color name="UPgray70" value="0.706 0.725 0.722"/>
+<color name="UPgreen" value="0 0.376 0.224"/>
+<color name="UPgreen10" value="0.934 0.957 0.947"/>
+<color name="UPgreen20" value="0.867 0.914 0.894"/>
+<color name="UPgreen50" value="0.471 0.659 0.576"/>
+<color name="UPgreen70" value="0.298 0.545 0.435"/>
+<color name="UPorange" value="0.949 0.58 0"/>
+<color name="UPorange10" value="0.992 0.941 0.862"/>
+<color name="UPorange20" value="0.984 0.882 0.725"/>
+<color name="UPorange50" value="0.969 0.769 0.451"/>
+<color name="UPorange70" value="0.951 0.694 0.271"/>
+<color name="UPred" value="0.898 0.192 0.22"/>
+<color name="UPred20" value="0.969 0.776 0.784"/>
+<color name="UPred50" value="0.941 0.557 0.573"/>
+<color name="UPred70" value="0.925 0.412 0.431"/>
+<color name="oxblue" value="0 0.129 0.278"/>
+<color name="tumblue" value="0.173 0.443 0.71"/>
+<opacity name="10%" value="0.1"/>
+<opacity name="20%" value="0.2"/>
+<opacity name="30%" value="0.3"/>
+<opacity name="40%" value="0.4"/>
+<opacity name="50%" value="0.5"/>
+<opacity name="60%" value="0.6"/>
+<opacity name="70%" value="0.7"/>
+<opacity name="80%" value="0.8"/>
+<opacity name="90%" value="0.9"/>
+<textstretch name="Huge" value="1.1"/>
+<textstretch name="LARGE" value="1"/>
+<textstretch name="Large" value="1"/>
+<textstretch name="footnote" value="1"/>
+<textstretch name="huge" value="1"/>
+<textstretch name="large" value="1"/>
+<textstretch name="normal" value="1"/>
+<textstretch name="small" value="1"/>
+<textstretch name="tiny" value="1"/>
+<layout paper="960 540" origin="0 0" frame="960 540" crop="no"/>
+</ipestyle>
+<page>
+<layer name="alpha"/>
+<view layers="alpha" active="alpha"/>
+<text layer="alpha" matrix="1 0 0 1 635.716 16" transformations="translations" pos="144 512" stroke="black" type="minipage" width="160" height="26.559" depth="21.63" valign="top">\includegraphics[height=1.7cm]{figures/tum_logo}</text>
+<text matrix="1 0 0 1 -240.611 -146.764" transformations="translations" pos="256 672" stroke="tumblue" type="minipage" width="736" height="15.1646" depth="9.702" valign="top" size="Huge">\bfseries Cooperative Multi-agent RL for Factory Manipulation</text>
+<text matrix="1 0 0 1 -0.611 -130.513" transformations="translations" pos="16 624" stroke="black" type="minipage" width="736" height="9.671" depth="4.69" valign="top" size="Large">\textsc{Nikolas Kirschstein} \&amp; \textsc{Kassian Köck} (Team 7)</text>
+<text matrix="0.947368 0 0 0.713726 304.842 -14.4255" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="67.899" depth="63.07" valign="top">\begin{tcolorbox}[adjusted title=(A) Continuous Control: Reward Shaping, colframe=tumblue]
+
+\begin{itemize}
+\item \uline{problem:} learning hard due to discrete, \textit{highly sparse} reward\\
+$\implies$ denser reward function needed
+
+\item \uline{desirable incentives:}
+\begin{itemize}
+\item[] $I_0$: reward \textit{new cubes} put into bucket
+\item[] $I_1$: reward approach of \textit{gripper} to closest cube
+\item[] $I_2$: reward approach of closest cube to \textit{bucket}
+\end{itemize}
+\vspace*{-.0em}
+\item \uline{reward function:} $r = r_0 + \omega_0 I_0 + \omega_1 I_1 + \omega_2 I_2$\\
+(base reward $r_0$ prevents learning to terminate episode)
+
+\end{itemize}
+
+\end{tcolorbox}</text>
+<text matrix="0.947368 0 0 0.713726 0.700845 -137.018" transformations="translations" pos="16 496" stroke="black" type="minipage" width="288" height="60.773" depth="55.92" valign="top">\begin{tcolorbox}[adjusted title=Given: The Environment,colframe=UPgray]
+\vspace*{-1pt}
+\begin{itemize}
+\item even number of robot arms (8 DOF each)
+\item basket in reach for each arm
+\item conveyor belt with increasing speed transporting cubes
+\item score = number of cubes in baskets
+\item episode termination if either:
+\begin{itemize}
+\item arm hits the environment (incl. other arms)
+\item cube is missed by all arms
+\vspace*{-1pt}
+\end{itemize}
+\end{itemize}
+\end{tcolorbox}
+
+</text>
+<text matrix="1 0 0 1 444.322 -100.409" transformations="translations" pos="432 624" stroke="tumblue" type="minipage" width="96" height="23.393" depth="18.45" valign="top" size="large">\begin{tabular}{l}
+Technical \\
+University of \\
+Munich
+\end{tabular}</text>
+<text matrix="0.947368 0 0 0.713726 624.842 -267.793" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="37.666" depth="32.76" valign="top">\begin{tcolorbox}[adjusted title=Future Work, colframe=orange]
+\begin{itemize}
+\item modify setting s.t. discrete control decides \textit{which cube to grab}
+\item introduce \textit{auxiliary tasks} (grip,\hspace*{1pt}carry,\hspace*{1pt}release) \&amp; \textit{curriculum learning}\\
+$\implies$ requires careful design and much more computing resources
+\end{itemize}
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0 -16.1328" transformations="translations" pos="320 480" stroke="black" type="minipage" width="304" height="57.239" depth="52.37" valign="top">
+
+\begin{tcolorbox}[adjusted title=(A) Continuous Control: Setting, colframe=tumblue]
+\textbf{action space:}
+ \([-1,1]\) per joint and learnt arm to control joint state
+
+\textbf{observation space:} joint and cube states\\
+
+\vspace*{-1em}
+\uline{learning choices per arm:}
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item \textit{full RL:} learn entire joint control RL from scratch (hard)
+\item \textit{delta:} learn only deviation from IK base policy (simplication)
+\item \textit{base}: execute IK base policy (baseline)
+\end{itemize}
+
+
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0 15.8672" transformations="translations" pos="640 448" stroke="black" type="minipage" width="304" height="57.021" depth="52.15" valign="top">\begin{tcolorbox}[adjusted title=(B) Discrete Control: Setting, colframe=oxblue]
+\textbf{action space:} \(\{\textsc{on}, \textsc{off}\}\) per arm to toggle use of IK base policy
+
+\textbf{observation space:} joint and cube states \textit{+ proposed IK control}\\ 
+
+\vspace*{-1em}
+\uline{behaviour choices for case \textsc{off}:\vphantom{p}}
+\begin{itemize}
+\item \textit{pause:} freeze at the current position
+\item \textit{retreat:} return to a safe default position
+\item \textit{base:} continue executing IK policy
+\end{itemize}
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0 35.7089" transformations="translations" pos="640 304" stroke="black" type="minipage" width="304" height="120.243" depth="115.53" valign="top">\begin{tcolorbox}[adjusted title=(B) Discrete Control: Results, colframe=oxblue]
+
+\uline{for case of 4 robot arms}:
+\begin{itemize}
+\item \textit{pure sparse score-based reward} suffices for effective learning!
+\item successful \textit{dodging and gripping}! (see screenshot (B) and videos)
+\item pausing strategy manages to \textit{improve upon baseline}!
+\end{itemize}
+
+\vspace*{-1mm}
+\begin{center}
+\renewcommand{\arraystretch}{0}
+test results averaged over 100 episodes
+\begin{tabular}{lll}\toprule
+learning choice &amp; avg episode score &amp; avg episode length \\\midrule
+\itshape pause &amp; $(2.01, 1.5)$ &amp; $173.04$ \\\midrule
+\itshape retreat &amp; $(0, 2.12)$ &amp; $216.74$ \\\midrule
+\itshape base &amp; $(1.18, 1.16)$ &amp; $119.74$ \\\bottomrule
+\end{tabular}
+
+\end{center}
+
+\includegraphics[width=0.5\textwidth]{figures/ep_score_mean}
+\includegraphics[width=0.5\textwidth]{figures/ep_len_mean}
+
+\end{tcolorbox}</text>
+<text matrix="0.947368 0 0 0.713726 1.142 -41.502" transformations="translations" pos="16 496" stroke="black" type="minipage" width="288" height="42.639" depth="37.75" valign="top">\begin{tcolorbox}[adjusted title=Big Picture,colframe=UPorange]
+\vspace*{-1pt}
+\textbf{goal:} \textit{multiple robot arms cooperating to maximise efficiency in factory manipulation task}
+\begin{itemize}
+\item conventional pre-programming too inflexible and tedious
+\item multi-agent RL may find near-optimal behaviour
+\vspace*{-1pt}
+\end{itemize}
+
+\end{tcolorbox}
+
+</text>
+<text matrix="1 0 0 1 -304 -395.067" transformations="translations" pos="320 480" stroke="black" type="minipage" width="288" height="36.832" depth="31.93" valign="top">
+
+\begin{tcolorbox}[adjusted title= Given: IK Base Policy, colframe=UPgray]
+\vspace*{-1pt}
+\begin{itemize}
+\item state machine working on \textit{one target object at a time}
+\item different base policies \textit{ignore each others&apos;} target objects
+\item control calculated via \textit{inverse kinematics (IK)}
+\vspace{-1pt}
+\end{itemize}
+\end{tcolorbox}</text>
+<text matrix="1 0 0 1 0.178947 -63.074" transformations="translations" pos="320 256" stroke="black" type="minipage" width="304" height="90.811" depth="86.04" valign="top">\begin{tcolorbox}[adjusted title=(A) Continuous Control: Results, colframe=tumblue]
+
+\uline{for 2 robot arms (simplest case)}:
+
+\begin{itemize}
+\item pure sparse reward: absolutely no learning, \textit{random behaviour}
+\item progress-based reward (\(r_0 = 0.4, \omega_0 = 1, \omega_2 = 0.2, \omega_3 = 0.4\))
+\begin{itemize}	
+\item successful \textit{collision avoidance} due to implicit survival reward
+\item BUT: \textit{no gripping} at all (see screenshot (A) and videos)
+\end{itemize}
+\end{itemize}
+
+\vspace*{-1.5mm}
+\begin{center}
+\renewcommand{\arraystretch}{0}
+test results averaged over 100 episodes
+\begin{tabular}{lll}\toprule
+learning choice &amp; avg episode score &amp; avg episode length \\\midrule
+\itshape full RL &amp; $(0, 0)$ &amp; $219.9$ \\\midrule
+\itshape delta &amp; $(0,0)$ &amp; $220.5$ \\\midrule
+\itshape base &amp; $(1.65, 1.17)$ &amp; $208.8$ \\\bottomrule
+\end{tabular}
+\vspace*{-1pt}
+\end{center}
+\end{tcolorbox}</text>
+<text transformations="translations" pos="16 464" stroke="black" type="minipage" width="135.171" height="70.001" depth="65.17" valign="top">\includegraphics[width=\textwidth]{figures/screenshot_continuous.jpg}</text>
+<text matrix="1 0 0 1 152.824 0" transformations="translations" pos="16 464" stroke="black" type="minipage" width="135.171" height="70.001" depth="65.17" valign="top">\includegraphics[width=\textwidth]{figures/screenshot_discrete.jpg}</text>
+</page>
+</ipe>
