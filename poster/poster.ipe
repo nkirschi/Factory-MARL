@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20240705104135" modified="D:20240721210841" tex="xetex"/>
+<info created="D:20240705104135" modified="D:20240802201551" tex="xetex"/>
 <preamble>\usepackage{graphicx}
 \usepackage{forest}
 \usepackage{tcolorbox}
@@ -655,7 +655,7 @@ conventional pre-programming too \textit{inflexible} and \textit{tedious}\\
 
 \begin{itemize}
 \item pure sparse reward: absolutely no learning, \textit{random behaviour}
-\item progress-based reward (\(r_0 = 0.4, \omega_0 = 1, \omega_2 = 0.2, \omega_3 = 0.4\))
+\item progress-based reward (\(r_0 = 0.4, \omega_0 = 1, \omega_1 = 0.2, \omega_2 = 0.4\))
 \begin{itemize}	
 \item successful \textit{collision avoidance} due to implicit survival reward
 \item BUT: \textit{no gripping} at all (see screenshot (A) and videos)
