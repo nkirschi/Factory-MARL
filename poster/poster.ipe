@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE ipe SYSTEM "ipe.dtd">
 <ipe version="70218" creator="Ipe 7.2.29">
-<info created="D:20240705104135" modified="D:20240802201551" tex="xetex"/>
+<info created="D:20240705104135" modified="D:20240809114404" tex="xetex"/>
 <preamble>\usepackage{graphicx}
 \usepackage{forest}
 \usepackage{tcolorbox}
@@ -518,9 +518,9 @@ h
 <layer name="alpha"/>
 <view layers="alpha" active="alpha"/>
 <text layer="alpha" matrix="1 0 0 1 635.716 16" transformations="translations" pos="144 512" stroke="black" type="minipage" width="160" height="26.559" depth="21.63" valign="top">\includegraphics[height=1.7cm]{figures/tum_logo}</text>
-<text matrix="1 0 0 1 -240.611 -146.764" transformations="translations" pos="256 672" stroke="tumblue" type="minipage" width="736" height="15.1646" depth="9.702" valign="top" size="Huge">\bfseries Cooperative Multi-agent RL for Factory Manipulation</text>
+<text matrix="1 0 0 1 -240.611 -146.764" transformations="translations" pos="256 672" stroke="tumblue" type="minipage" width="736" height="15.1646" depth="9.702" valign="top" size="Huge">\bfseries Factory Manipulation with Cooperative Multi-agent RL</text>
 <text matrix="1 0 0 1 -0.611 -130.513" transformations="translations" pos="16 624" stroke="black" type="minipage" width="736" height="9.671" depth="4.69" valign="top" size="Large">\textbf{Nikolas Kirschstein} \&amp; \textbf{Kassian Köck} (Team 7)</text>
-<text matrix="0.947368 0 0 0.713726 304.842 -14.4255" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="67.899" depth="63.07" valign="top">\begin{tcolorbox}[adjusted title=(A) Continuous Control: Reward Shaping, colframe=tumblue]
+<text matrix="0.947368 0 0 0.713726 304.842 -14.4255" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="67.899" depth="63.07" valign="top">\begin{tcolorbox}[adjusted title=(A) Full Joint Control: Reward Shaping, colframe=tumblue]
 
 \begin{itemize}
 \item \uline{problem:} learning hard due to discrete, \textit{highly sparse} reward\\
@@ -561,16 +561,16 @@ Technical \\
 University of \\
 Munich
 \end{tabular}</text>
-<text matrix="0.947368 0 0 0.713726 624.842 -267.793" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="37.666" depth="32.76" valign="top">\begin{tcolorbox}[adjusted title=Future Work, colframe=orange]
+<text matrix="0.947368 0 0 0.713726 624.842 -267.793" transformations="translations" pos="16 496" stroke="black" type="minipage" width="304" height="37.616" depth="32.7" valign="top">\begin{tcolorbox}[adjusted title=Future Work, colframe=orange]
 \begin{itemize}
-\item modify setting s.t. discrete control decides \textit{which cube to grab}
+\item relax coordination-only setting to deciding \textit{which cube to grab}
 \item introduce \textit{auxiliary tasks} (grip,\hspace*{1pt}carry,\hspace*{1pt}release) \&amp; \textit{curriculum learning}\\
 $\implies$ requires careful design and much more computing resources
 \end{itemize}
 \end{tcolorbox}</text>
 <text matrix="1 0 0 1 0 -16.1328" transformations="translations" pos="320 480" stroke="black" type="minipage" width="304" height="57.239" depth="52.37" valign="top">
 
-\begin{tcolorbox}[adjusted title=(A) Continuous Control: Setting, colframe=tumblue]
+\begin{tcolorbox}[adjusted title=(A) Full Joint Control: Setting, colframe=tumblue]
 \textbf{action space:}
  \([-1,1]\) per joint and learnt arm to control joint state
 
@@ -580,14 +580,14 @@ $\implies$ requires careful design and much more computing resources
 \uline{learning choices per arm:}
 \begin{itemize}
 \setlength{\itemsep}{0pt}
-\item \textit{full RL:} learn entire joint control RL from scratch (hard)
+\item \textit{from-scratch:} learn entire joint control just with RL (hard)
 \item \textit{delta:} learn only deviation from IK base policy (simplification)
 \item \textit{base}: execute IK base policy (baseline)
 \end{itemize}
 
 
 \end{tcolorbox}</text>
-<text matrix="1 0 0 1 0 15.8672" transformations="translations" pos="640 448" stroke="black" type="minipage" width="304" height="57.021" depth="52.15" valign="top">\begin{tcolorbox}[adjusted title=(B) Discrete Control: Setting, colframe=oxblue]
+<text matrix="1 0 0 1 0 15.8672" transformations="translations" pos="640 448" stroke="black" type="minipage" width="304" height="57.021" depth="52.15" valign="top">\begin{tcolorbox}[adjusted title=(B) IK Toggling Control: Setting, colframe=oxblue]
 \textbf{action space:} \(\{\textsc{on}, \textsc{off}\}\) per arm to toggle use of IK base policy
 
 \textbf{observation space:} joint and cube states \textit{+ proposed IK control}\\ 
@@ -600,7 +600,7 @@ $\implies$ requires careful design and much more computing resources
 \item \textit{base:} continue executing IK policy
 \end{itemize}
 \end{tcolorbox}</text>
-<text matrix="1 0 0 1 0 35.7089" transformations="translations" pos="640 304" stroke="black" type="minipage" width="304" height="120.243" depth="115.53" valign="top">\begin{tcolorbox}[adjusted title=(B) Discrete Control: Results, colframe=oxblue]
+<text matrix="1 0 0 1 0 35.7089" transformations="translations" pos="640 304" stroke="black" type="minipage" width="304" height="120.243" depth="115.53" valign="top">\begin{tcolorbox}[adjusted title=(B) IK Toggling Control: Results, colframe=oxblue]
 
 \uline{for case of 4 robot arms}:
 \begin{itemize}
@@ -614,9 +614,9 @@ $\implies$ requires careful design and much more computing resources
 \renewcommand{\arraystretch}{0}
 test results averaged over 100 episodes
 \begin{tabular}{lll}\toprule
-learning choice &amp; avg episode score &amp; avg episode length \\\midrule
-\itshape pause &amp; $(2.01, 1.5)$ &amp; $173.04$ \\\midrule
-\itshape retreat &amp; $(0, 2.12)$ &amp; $216.74$ \\\midrule
+behaviour choice &amp; avg episode score &amp; avg episode length \\\midrule
+\itshape pause &amp; $\mathbf{(2.01, 1.5)}$ &amp; $173.04$ \\\midrule
+\itshape retreat &amp; $(0, 2.12)$ &amp; $\mathbf{216.74}$ \\\midrule
 \itshape base &amp; $(1.18, 1.16)$ &amp; $119.74$ \\\bottomrule
 \end{tabular}
 
@@ -649,7 +649,7 @@ conventional pre-programming too \textit{inflexible} and \textit{tedious}\\
 \vspace{-1pt}
 \end{itemize}
 \end{tcolorbox}</text>
-<text matrix="1 0 0 1 0.178947 -63.074" transformations="translations" pos="320 256" stroke="black" type="minipage" width="304" height="90.811" depth="86.04" valign="top">\begin{tcolorbox}[adjusted title=(A) Continuous Control: Results, colframe=tumblue]
+<text matrix="1 0 0 1 0.178947 -63.074" transformations="translations" pos="320 256" stroke="black" type="minipage" width="304" height="90.811" depth="86.04" valign="top">\begin{tcolorbox}[adjusted title=(A) Full Joint Control: Results, colframe=tumblue]
 
 \uline{for 2 robot arms (simplest case)}:
 
@@ -668,15 +668,15 @@ conventional pre-programming too \textit{inflexible} and \textit{tedious}\\
 test results averaged over 100 episodes
 \begin{tabular}{lll}\toprule
 learning choice &amp; avg episode score &amp; avg episode length \\\midrule
-\itshape full RL &amp; $(0, 0)$ &amp; $219.9$ \\\midrule
-\itshape delta &amp; $(0,0)$ &amp; $220.5$ \\\midrule
-\itshape base &amp; $(1.65, 1.17)$ &amp; $208.8$ \\\bottomrule
+\itshape from-scratch &amp; $(0, 0)$ &amp; $\mathbf{219.9}$ \\\midrule
+\itshape delta &amp; $(0,0)$ &amp; $\mathbf{220.5}$ \\\midrule
+\itshape base &amp; $\mathbf{(1.65, 1.17)}$ &amp; $208.8$ \\\bottomrule
 \end{tabular}
 \vspace*{-1pt}
 \end{center}
 \end{tcolorbox}</text>
-<text transformations="translations" pos="16 464" stroke="black" type="minipage" width="135.171" height="70.001" depth="65.17" valign="top">\includegraphics[width=\textwidth]{figures/screenshot_continuous.jpg}</text>
-<text matrix="1 0 0 1 152.824 0" transformations="translations" pos="16 464" stroke="black" type="minipage" width="135.171" height="70.001" depth="65.17" valign="top">\includegraphics[width=\textwidth]{figures/screenshot_discrete.jpg}</text>
+<text transformations="translations" pos="16 464" stroke="black" type="minipage" width="135.171" height="69.998" depth="65.17" valign="top">\includegraphics[width=\textwidth]{figures/screenshot_two_arms.jpg}</text>
+<text matrix="1 0 0 1 152.824 0" transformations="translations" pos="16 464" stroke="black" type="minipage" width="135.171" height="69.998" depth="65.17" valign="top">\includegraphics[width=\textwidth]{figures/screenshot_four_arms.jpg}</text>
 <text matrix="1 0 0 1 0 -123.095" transformations="translations" pos="16 464" stroke="white" type="minipage" width="135.171" height="7.473" depth="2.49" valign="top" style="center">(A)</text>
 <text matrix="1 0 0 1 152.824 -123.095" transformations="translations" pos="16 464" stroke="white" type="minipage" width="135.171" height="7.473" depth="2.49" valign="top" style="center">(B)</text>
 </page>
