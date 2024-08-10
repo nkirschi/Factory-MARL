@@ -1,18 +1,19 @@
 # ADLR Challenge Summer Term 2024
 
-This repository contains the starting point for the ADLR Factory Manipulation Challenge in the summer term 2024.
+This repository contains the code of Team 7 participating in the ADLR Factory Manipulation Challenge in the summer term 2024.
 
-The challenge is about learning behaviors for a robot manipulator to collect objects from a conveyor belt and put them into a basket. 
+The challenge considers behaviours for a robot manipulator to pick objects from a conveyor belt and place them into a basket. 
 
-The objective is to maximize the number of objects collected during an episode.
-The episode terminates when any object leaves the table area.
+The objective is to maximise the number of objects collected during an episode.
+An episode terminates once any object leaves the workspace or any arm collides with something.
 
-![demo](challenge_env/media/demo.gif)
+![demo](videos/demo.gif)
 
-# Installation
+
+## Installation
 
 1. Fork this repository and clone it to your machine.
-2. Create a new virtual environment, activate it and install the dependencies using pip. 
+2. Create a new virtual environment, activate it and install the dependencies using `pip`. 
 For example:
 ```bash
    conda create -n "adlr" python==3.10
@@ -20,7 +21,26 @@ For example:
    pip install -e ./challenge_env
 ```
 
-# Headless rendering
+## Getting started
+
+The folder `src` contains all challenge-specific code.
+- `environments.py` contains class definitions for custom environments
+- `learning.py` is the training script
+- `visualisation.py` is a script for running simulations
+
+To execute a simulation visually, run:
+```bash
+python src/visualisation.py
+```
+If there is no visual output, make sure `RENDER_MODE` is set to `"human"` in the script.
+
+## Artifacts
+
+The folders `poster`, `preso`, `report`, and `videos` contain the project poster, milestone presentation, final report,
+and demo videos, respectively.
+
+
+## Headless rendering
 
 For headless rendering (e.g. on a vm without a display), you need to install the following dependencies:
 ```bash
@@ -36,16 +56,3 @@ os.environ["MUJOCO_GL"] = "osmesa" # set environment variable for headless rende
 env = TaskEnv(render_mode="rgb_array") # create environment with rgb_array rendering
 rgb_array = env.render() # renders the environment
 ```
-
-
-# Get started
-The file `learn/task_env.py` contains a template for a training task 
-as well as a simple loop to interact with the environment. 
-
-To view the task, run:
-```bash
-python learn/task_env.py
-```
-
-We also provide an example of running a vectorized version of the environment in `learn/vec_env_example.py`.
-
