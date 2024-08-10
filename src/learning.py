@@ -10,6 +10,46 @@ import stable_baselines3
 import wandb
 
 
+"""
+This file contains the training script based on the RL library Stable Baselines 3.
+"""
+
+
+# BEGIN configurable part #
+
+CONFIG = dict(
+    num_envs=8,
+    env_class="PauseIKToggleEnv",
+    env_kwargs={
+        "num_arms": 4,
+        "render_mode": "rgb_array",
+        "seed": 42,
+        "initial_conveyor_speed": 0.1,
+        "conveyor_acceleration": 0.001,
+        "pt_time": 0.2,
+        "force_contact_threshold": 200.0,
+        "max_num_objects": 10,
+        "control_frequency": 10,
+        "spawn_freq": 1 / 10,
+        "spawn_freq_increase": 1.001,
+        # gripper_to_closest_cube_reward_factor=0.1,
+        # closest_cube_to_bucket_reward_factor=0.1,
+        # small_action_norm_reward_factor=0,
+        # base_reward=0
+    },
+    notes="CHANGEME!",  # adjust this before every run
+    rl_algo="PPO",
+    total_timesteps=int(5e6),
+    policy_type="MlpPolicy",
+    policy_kwargs={
+        "net_arch": [128, 128]
+    },
+    discount_factor=0.99,
+)
+
+# END configurable part #
+
+
 class AdditionalMetricsCallback(BaseCallback):
     """
     Custom callback for plotting additional metrics in tensorboard.
@@ -33,6 +73,9 @@ class AdditionalMetricsCallback(BaseCallback):
 
 
 class SyncifiedCheckpointCallback(CheckpointCallback):
+    """
+    Custom callback for saving checkpoints at explicit frequencies.
+    """
     def __int__(self, **kwargs):
         super().__init__(**kwargs)
 
@@ -44,36 +87,6 @@ class SyncifiedCheckpointCallback(CheckpointCallback):
 
 
 if __name__ == "__main__":
-    CONFIG = dict(
-        num_envs=8,
-        env_class="BackupIKToggleEnv",
-        env_kwargs={
-            "num_arms": 4,
-            "render_mode": "rgb_array",
-            "seed": 42,
-            "initial_conveyor_speed": 0.1,
-            "conveyor_acceleration": 0.001,
-            "pt_time": 0.2,
-            "force_contact_threshold": 200.0,
-            "max_num_objects": 10,
-            "control_frequency": 10,
-            "spawn_freq": 1 / 10,
-            "spawn_freq_increase": 1.001,
-            # gripper_to_closest_cube_reward_factor=0.1,
-            # closest_cube_to_bucket_reward_factor=0.1,
-            # small_action_norm_reward_factor=0,
-            # base_reward=0
-        },
-        notes="CHANGEME!",  # adjust this before every run
-        rl_algo="PPO",
-        total_timesteps=int(5e6),
-        policy_type="MlpPolicy",
-        policy_kwargs={
-            "net_arch": [128, 128]
-        },
-        discount_factor=0.99,
-    )
-
     # os.environ["MUJOCO_GL"] = "osmesa"
     wandb.login(key="f4cdba55e14578117b20251fd078294ca09d974d", verify=True)
     run = wandb.init(project="adlr",
@@ -98,9 +111,9 @@ if __name__ == "__main__":
                                                           verbose=1)
     model.learn(total_timesteps=CONFIG["total_timesteps"],
                 callback=[SyncifiedCheckpointCallback(save_freq=CONFIG["total_timesteps"] // 10 // CONFIG["num_envs"],
-                                                      save_path=f"runs/{run.id}/checkpoints"),
+                                                      save_path=f"../runs_old/{run.id}/checkpoints"),
                           WandbCallback(model_save_freq=CONFIG["total_timesteps"] // 10 // CONFIG["num_envs"],
-                                        model_save_path=f"runs/{run.id}/checkpoints",
+                                        model_save_path=f"../runs_old/{run.id}/checkpoints",
                                         verbose=2),
                           AdditionalMetricsCallback()])
 
