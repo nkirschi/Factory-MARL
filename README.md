@@ -1,4 +1,4 @@
-# ADLR Challenge Summer Term 2024
+# Factory Manipulation with Cooperative	Multi-Agent Reinforcement Learning
 
 This repository contains the code of Team 7 participating in the ADLR Factory Manipulation Challenge in the summer term 2024.
 
@@ -13,7 +13,7 @@ An episode terminates once any object leaves the workspace or any arm collides w
 ## Installation
 
 1. Fork this repository and clone it to your machine.
-2. Create a new virtual environment, activate it and install the dependencies using `pip`. 
+2. Install the dependencies using `pip`. 
 For example:
 ```bash
    conda create -n "adlr" python==3.10
