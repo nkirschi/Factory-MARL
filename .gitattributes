@@ -1,1 +1,3 @@
-*.tex linguist-vendored
+poster/* linguist-vendored
+preso/* linguist-vendored
+report/* linguist-vendored
